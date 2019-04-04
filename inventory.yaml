@@ -1,0 +1,51 @@
+---
+config:
+  transport: ssh
+  ssh:
+    user: centos
+    host-key-check: false
+    run-as: root
+
+nodes:
+  - name: local
+    config:
+      transport: local
+  - name: ec2-34-213-235-78.us-west-2.compute.amazonaws.com
+    alias: search_head
+  - name: ec2-35-161-199-75.us-west-2.compute.amazonaws.com
+    alias: forwarder0
+  - name: ec2-54-244-168-136.us-west-2.compute.amazonaws.com
+    alias: forwarder1
+  - name: ec2-54-213-255-58.us-west-2.compute.amazonaws.com
+    alias: forwarder2
+  - name: ec2-54-185-189-75.us-west-2.compute.amazonaws.com
+    alias: forwarder3
+  - name: ec2-54-185-188-176.us-west-2.compute.amazonaws.com
+    alias: forwarder4
+  - name: ec2-34-219-229-132.us-west-2.compute.amazonaws.com
+    alias: forwarder5
+  - name: ec2-52-26-233-132.us-west-2.compute.amazonaws.com
+    alias: forwarder6
+  - name: ec2-34-214-122-9.us-west-2.compute.amazonaws.com
+    alias: forwarder7
+  - name: ec2-34-222-228-114.us-west-2.compute.amazonaws.com
+    alias: forwarder8
+  - name: ec2-54-187-92-120.us-west-2.compute.amazonaws.com
+    alias: forwarder9
+
+groups:
+  - name: searcher
+    nodes:
+      - search_head
+  - name: forwarders
+    nodes:
+      - forwarder0
+      - forwarder1
+      - forwarder2
+      - forwarder3
+      - forwarder4
+      - forwarder5
+      - forwarder6
+      - forwarder7
+      - forwarder8
+      - forwarder9
