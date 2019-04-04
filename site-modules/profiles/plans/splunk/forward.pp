@@ -8,14 +8,13 @@ plan profiles::splunk::forward() {
   $forwarders.apply_prep
 
   apply($forwarders) {
-    # 7.2 currently no supported by relesed module
-    #class { 'splunk::params':
-    #  server  => $search_host,
-    #  version => '7.2.5',
-    #  build   => '088f49762779',
-    #}
+    class { 'splunk::params':
+      server  => $search_host,
+      version => '7.2.5',
+      build   => '088f49762779',
+    }
 
-    class { 'splunk::forwarder': package_ensure => latest }
+    class { 'splunk::forwarder': package_ensure => latest, manage_password => true }
 
     splunkforwarder_input { 'var_log_messages':
       section => 'monitor:///var/log/messages',

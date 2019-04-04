@@ -6,11 +6,10 @@ plan profiles::splunk::search() {
 
   #Compile the manifest block into a catalog
   apply($searcher) {
-    # 7.2 currently no supported by relesed module
-    # class { 'splunk::params':
-    #   version => '7.2.5',
-    #   build   => '088f49762779',
-    # }
-    class { 'splunk::enterprise': package_ensure => latest }
+    class { 'splunk::params':
+      version => '7.2.5',
+      build   => '088f49762779',
+    }
+    class { 'splunk::enterprise': package_ensure => latest, manage_password => true }
   }
 }

@@ -39,7 +39,7 @@ mod 'puppet-archive', '3.2.1'
 mod 'puppetlabs-amazon_aws', '0.2.0'
 
 # Need to rest updated version of module
-mod 'puppet-splunk', '7.3.0'
-#mod 'puppet-splunk',
-#    git: 'https://github.com/nick-markowski/puppet-splunk',
-#    ref: '7_2_support'
+#mod 'puppet-splunk', '7.3.0'
+mod 'puppet-splunk',
+    git: 'https://github.com/nick-markowski/puppet-splunk',
+    ref: '7_2_support'
