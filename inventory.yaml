@@ -10,7 +10,7 @@ nodes:
   - name: local
     config:
       transport: local
-  - name: ec2-54-148-161-116.us-west-2.compute.amazonaws.com
+  - name: ec2-54-186-237-206.us-west-2.compute.amazonaws.com
     alias: search_head
   - name: ec2-54-186-55-90.us-west-2.compute.amazonaws.com
     alias: forwarder0

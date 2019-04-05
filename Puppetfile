@@ -41,5 +41,5 @@ mod 'puppet-archive', '3.2.1'
 # Need to rest updated version of module
 #mod 'puppet-splunk', '7.3.0'
 mod 'puppet-splunk',
-    git: 'https://github.com/nick-markowski/puppet-splunk',
-    ref: '7_2_support'
+    git: 'https://github.com/voxpupuli/puppet-splunk.git',
+    ref: 'master'

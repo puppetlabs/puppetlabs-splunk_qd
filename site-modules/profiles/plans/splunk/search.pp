@@ -1,4 +1,4 @@
-plan profiles::splunk::search() {
+plan profiles::splunk::search(Boolean $restore = false) {
 
   $searcher = get_targets('searcher')
 
@@ -11,6 +11,15 @@ plan profiles::splunk::search() {
       build   => '088f49762779',
     }
     class { 'splunk::enterprise': package_ensure => latest, manage_password => true }
+  }
+
+  if $restore {
+    run_task('service::linux', $searcher, { action => 'stop', name => 'Splunkd' })
+    run_command('rm -rf /opt/splunk/var/lib/splunk/defaultdb/db', $searcher, 'Nuke existing hot/warm database')
+    upload_file('profiles/splunk/backups/splunk_db_backup.tar.gz', '/tmp/splunk_db_backup.tar.gz', $searcher, 'Uploading Splunk Backup Archive')
+    run_command('tar -xzvf /tmp/splunk_db_backup.tar.gz -C /opt/splunk/var/lib/splunk/defaultdb', $searcher, 'Expanding Splunk Backup Archive')
+    run_command('rm /tmp/splunk_db_backup.tar.gz', $searcher, 'Cleaning up Splunk Backup Archive')
+    run_task('service::linux', $searcher, { action => 'start', name => 'Splunkd' })
   }
 
   # These files need to eventually be removed from the module and capable of
@@ -28,16 +37,9 @@ plan profiles::splunk::search() {
     run_command('rm /tmp/puppet-tasks-actionable-alerts-for-splunk_101.tgz', $searcher)
   }
 
-  # While addons are managed outside of Puppet we have to do this twice to
-  # restart services and good evidence for integrating addons into module
+  # While addons are managed outside of Puppet we have to do this exterally to
+  # restart services, good evidence for integrating addons into module
   if true in [defined('$rv_installed'), defined('$aa_installed')] {
-    apply($searcher) {
-      class { 'splunk::params':
-        version => '7.2.5',
-        build   => '088f49762779',
-      }
-      class { 'splunk::enterprise': package_ensure => latest, manage_password => true }
-      notify { 'trigger':} ~> Class['splunk::enterprise::service']
-    }
+    run_task('service::linux', $searcher, { action => 'restart', name => 'Splunkd' })
   }
 }
