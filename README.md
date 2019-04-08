@@ -1,9 +1,9 @@
 
-# splunk_qd
+# splunk_qd (Splunk Quick Deploy)
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
+Quick and simple deployment of Splunk for testing and evaulation.
 
-The README template below provides a starting point with details about what information to include in your README.
+Module still early in development so goals and code will be changing wildly.
 
 #### Table of Contents
 
@@ -18,71 +18,34 @@ The README template below provides a starting point with details about what info
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
+The premise of the module is to provide a facility for bringing online new instances of Splunk Enterprise with the option to import data from production deployments that enables people to evalate the product, do application and addon development, or test a major upgrade. To make sure usage is as simple as possible and we can implement a complete deployment workflow, we have chosen to focus on Puppet Bolt as opposed to purely classic Puppet. We'll re-use and depend on the Voxpupuli puppet-splunk module when ever appropriate so that any installation ininitially deployed through this method can be promoted to a production install and continuously maintained by Puppet safely and without many changes if any at all.
 
-This should be a fairly short description helps the user decide if your module is what they want.
+This means that what you'll find in this module is a collection of Bolt Plans that'll deploy different components of a Splunk Enterprise environment that applies Puppet manifests using Bolt's agentless apply functionality with some glue in between that might not fit well into Puppet's preference for managing desired state but is really only applicable for the use case of rapid initial deployment.
 
 ## Setup
 
-### What splunk_qd affects **OPTIONAL**
+### What splunk_qd affects
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
+It is not intended for this module to take over management of existing Splunk Enterprise installations but some exist that might interact with a living installation or the plans are generic enough that they could be repurposed, e.g. facilitating the backing up of indexes to be restored for the purpose of testing and development or onboarding and upgrading the universal forwarder.
 
-If there's more that they should know about, though, this is the place to mention:
+### Setup Requirements
 
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+Right now the module includes addons downloaded from splunkbase and tar file of sample data, both of these will be removed soon and only exist to assist in the intial prototyping process. It is the intention that the use must download these files ahead of time and place them is the right place before running the corresponding plan.
 
 ### Beginning with splunk_qd
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+The quickest way to get started is by adapting the included sample inventory file and simply running `bolt plan run splunk_qd` which will install an all-in-one Splunk Enterprise server with addons and point a set of nodes at the instance to begine forwarding logs.
 
 ## Usage
 
+Nothing yet...example text kept for my own reference
+
 Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
-
-## Reference
-
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
 
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
+Be design we are dependent on the puppet-splunk module so limitied to the deployment targets is supports and must adhere to its opinions on search head, indexer, and forwarder configuration
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+Contributions welcome just know that you should focus on the Puppet 5 syntax available in a default intallation of the latest release of Bolt and the code cannot depend on the existance of a master or puppetdb.
