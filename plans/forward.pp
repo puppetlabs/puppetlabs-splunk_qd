@@ -1,4 +1,4 @@
-plan profiles::splunk::forward() {
+plan splunk_qd::forward() {
 
   $searcher = get_targets('searcher')
   $forwarders = get_targets('forwarders')

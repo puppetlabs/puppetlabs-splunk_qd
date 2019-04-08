@@ -1,4 +1,4 @@
-plan profiles::splunk::search(Boolean $restore = false) {
+plan splunk_qd::search(Boolean $restore = false) {
 
   $searcher = get_targets('searcher')
 
@@ -16,7 +16,7 @@ plan profiles::splunk::search(Boolean $restore = false) {
   if $restore {
     run_task('service::linux', $searcher, { action => 'stop', name => 'Splunkd' })
     run_command('rm -rf /opt/splunk/var/lib/splunk/defaultdb/db', $searcher, 'Nuke existing hot/warm database')
-    upload_file('profiles/splunk/backups/splunk_db_backup.tar.gz', '/tmp/splunk_db_backup.tar.gz', $searcher, 'Uploading Splunk Backup Archive')
+    upload_file('splunk_qd/backups/splunk_db_backup.tar.gz', '/tmp/splunk_db_backup.tar.gz', $searcher, 'Uploading Splunk Backup Archive')
     run_command('tar -xzvf /tmp/splunk_db_backup.tar.gz -C /opt/splunk/var/lib/splunk/defaultdb', $searcher, 'Expanding Splunk Backup Archive')
     run_command('rm /tmp/splunk_db_backup.tar.gz', $searcher, 'Cleaning up Splunk Backup Archive')
     run_task('service::linux', $searcher, { action => 'start', name => 'Splunkd' })
@@ -27,12 +27,12 @@ plan profiles::splunk::search(Boolean $restore = false) {
   # puppet-splunk
   $installed = run_command('/opt/splunk/bin/splunk display app -auth admin:changeme', $searcher, '_catch_errors' => true).first['stdout'].split('\n').match(/^\S+/).flatten
   unless 'TA-puppet-report-viewer' in $installed {
-    upload_file('profiles/splunk/addons/puppet-report-viewer_135.tgz', '/tmp/puppet-report-viewer_135.tgz', $searcher, 'Uploading Splunk Addon: Puppet Report Viewer')
+    upload_file('splunk_qd/addons/puppet-report-viewer_135.tgz', '/tmp/puppet-report-viewer_135.tgz', $searcher, 'Uploading Splunk Addon: Puppet Report Viewer')
     $rv_installed = run_command('/opt/splunk/bin/splunk install app -auth admin:changeme /tmp/puppet-report-viewer_135.tgz', $searcher, '_catch_errors' => true)
     run_command('rm /tmp/puppet-report-viewer_135.tgz', $searcher)
   }
   unless 'TA-puppet-tasks-actionable' in $installed {
-    upload_file('profiles/splunk/addons/puppet-tasks-actionable-alerts-for-splunk_101.tgz', '/tmp/puppet-tasks-actionable-alerts-for-splunk_101.tgz', $searcher, 'Uploading Splunk Addon: Puppet Tasks Actionable Alerts')
+    upload_file('splunk_qd/addons/puppet-tasks-actionable-alerts-for-splunk_101.tgz', '/tmp/puppet-tasks-actionable-alerts-for-splunk_101.tgz', $searcher, 'Uploading Splunk Addon: Puppet Tasks Actionable Alerts')
     $aa_installed = run_command('/opt/splunk/bin/splunk install app -auth admin:changeme /tmp/puppet-tasks-actionable-alerts-for-splunk_101.tgz', $searcher, '_catch_errors' => true)
     run_command('rm /tmp/puppet-tasks-actionable-alerts-for-splunk_101.tgz', $searcher)
   }
