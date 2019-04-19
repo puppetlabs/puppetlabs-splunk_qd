@@ -10,23 +10,8 @@ nodes:
   - name: local
     config:
       transport: local
-  - name: ec2-54-244-141-61.us-west-2.compute.amazonaws.com
+  - name: ec2-52-32-128-163.us-west-2.compute.amazonaws.com
     alias: search_head
-  - name: ec2-54-214-200-239.us-west-2.compute.amazonaws.com
-    alias: forwarder0
-  - name: ec2-54-244-108-52.us-west-2.compute.amazonaws.com
-    alias: forwarder1
-  - name: ec2-34-221-60-234.us-west-2.compute.amazonaws.com
-    alias: forwarder2
-  - name: ec2-34-220-235-28.us-west-2.compute.amazonaws.com
-    alias: forwarder3
-  - name: ec2-35-162-56-240.us-west-2.compute.amazonaws.com
-    alias: forwarder4
-
-groups:
-  - name: searcher
-    nodes:
-      - search_head
     vars:
       addons:
         - name: Splunk_TA_nix
@@ -41,6 +26,24 @@ groups:
               interval:   86400
               source:     Unix:Uptime
               sourcetype: Unix:Uptime
+        - name: splunk_app_for_nix
+          filename: splunk-app-for-unix-and-linux_525.tgz
+        - name: TA-puppet-report-viewer
+          filename: puppet-report-viewer_135.tgz
+        - name: TA-puppet-tasks-actionable
+          filename: puppet-tasks-actionable-alerts-for-splunk_101.tgz
+  - name: ec2-54-214-200-239.us-west-2.compute.amazonaws.com
+    alias: forwarder0
+  - name: ec2-54-244-108-52.us-west-2.compute.amazonaws.com
+    alias: forwarder1
+  - name: ec2-34-221-60-234.us-west-2.compute.amazonaws.com
+    alias: forwarder2
+  - name: ec2-34-220-235-28.us-west-2.compute.amazonaws.com
+    alias: forwarder3
+  - name: ec2-35-162-56-240.us-west-2.compute.amazonaws.com
+    alias: forwarder4
+
+groups:
   - name: forwarders
     nodes:
       - forwarder0
