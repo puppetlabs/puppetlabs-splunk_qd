@@ -15,20 +15,11 @@ plan splunk_qd::forward() {
     }
 
     class { 'splunk::forwarder': package_ensure => latest, manage_password => true }
-    splunk::addon { 'Splunk_TA_nix':
-      splunkbase_source => 'puppet:///modules/splunk_qd/addons/splunk-add-on-for-unix-and-linux_602.tgz',
-      inputs            => {
-        'monitor:///var/log'       => {
-          'whitelist' => '(\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)',
-          'blacklist' => '(lastlog|anaconda\.syslog)',
-          'disabled'  => 'false'
-        },
-        'script://./bin/uptime.sh' =>  {
-          'disabled' => 'false',
-          'interval' => '86400',
-          'source' => 'Unix:Uptime',
-          'sourcetype' => 'Unix:Uptime'
-        }
+
+    $addons.each |$addon| {
+      splunk::addon { $addon['name']:
+        splunkbase_source => "puppet:///modules/splunk_qd/addons/${addon['filename']}",
+        inputs            => $addon['inputs'],
       }
     }
   }
