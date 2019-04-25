@@ -1,0 +1,42 @@
+---
+config:
+  transport: ssh # Currently only supporting Linux systems
+  ssh:
+    user: centos # Basic login user for instances to be managed
+    host-key-check: false # Disable SSH strict host key checking to make testing easier
+    run-as: root # Informs Bolt to escalate to the root user when running tasks
+
+nodes: # A list of host names or IP addresses and appropriate aliases
+  - name: ec2-54-214-200-239.us-west-2.compute.amazonaws.com
+    alias: forwarder0
+  - name: ec2-54-244-108-52.us-west-2.compute.amazonaws.com
+    alias: forwarder1
+  - name: ec2-34-221-60-234.us-west-2.compute.amazonaws.com
+    alias: forwarder2
+  - name: ec2-34-220-235-28.us-west-2.compute.amazonaws.com
+    alias: forwarder3
+  - name: ec2-35-162-56-240.us-west-2.compute.amazonaws.com
+    alias: forwarder4
+
+groups:
+  - name: forwarders # The splunk_qd plan looks for this group when querying for nodes to manage the Universal Forwarder on
+    nodes: # List of aliases as defined in the nodes section
+      - forwarder0
+      - forwarder1
+      - forwarder2
+      - forwarder3
+      - forwarder4
+    vars:
+      addons: # An array of hashes that define the Splunk add-ons (and apps) to be installed
+        - name: Splunk_TA_nix # Machine name of an add-on
+          filename: splunk-add-on-for-unix-and-linux_602.tgz # File name of the archive obtained from splunkbase
+          inputs: # Hash of add-on inputs to be configured
+            monitor:///var/log:
+              whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+              blacklist: (lastlog|anaconda\.syslog)
+              disabled:  false
+            script://./bin/uptime.sh:
+              disabled:   false
+              interval:   86400
+              source:     Unix:Uptime
+              sourcetype: Unix:Uptime

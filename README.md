@@ -18,7 +18,7 @@ Module still early in development so goals and code will be changing wildly.
 
 ## Description
 
-The premise of the module is to provide a facility for bringing online new instances of Splunk Enterprise with the option to import data from production deployments that enables people to evalate the product, do application and addon development, or test a major upgrade. To make sure usage is as simple as possible and we can implement a complete deployment workflow, we have chosen to focus on Puppet Bolt as opposed to purely classic Puppet. We'll re-use and depend on the Voxpupuli puppet-splunk module when ever appropriate so that any installation ininitially deployed through this method can be promoted to a production install and continuously maintained by Puppet safely and without many changes if any at all.
+The premise of the module is to provide a facility for bringing online new instances of Splunk Enterprise with the option to import data from production deployments that enables people to evalate the product, do application and addon development, or test a major upgrade. To make sure usage is as simple as possible and we can implement a complete deployment workflow, we have chosen to focus on Puppet Bolt as opposed to purely classic Puppet. We'll re-use and depend on the Voxpupuli puppet-splunk module when ever appropriate so that any installation initially deployed through this method can be promoted to a production install and continuously maintained by Puppet safely and without many changes if any at all.
 
 This means that what you'll find in this module is a collection of Bolt Plans that'll deploy different components of a Splunk Enterprise environment that applies Puppet manifests using Bolt's agentless apply functionality with some glue in between that might not fit well into Puppet's preference for managing desired state but is really only applicable for the use case of rapid initial deployment.
 
@@ -30,17 +30,58 @@ It is not intended for this module to take over management of existing Splunk En
 
 ### Setup Requirements
 
-Right now the module includes addons downloaded from splunkbase and tar file of sample data, both of these will be removed soon and only exist to assist in the intial prototyping process. It is the intention that the use must download these files ahead of time and place them is the right place before running the corresponding plan.
+It is required that you have an account on splunkbase are are able to obtain add-on or app archives from it if you desire to use splunk_qd to install them, there is no way to automate fetching them from splunkbase.
 
 ### Beginning with splunk_qd
 
-The quickest way to get started is by adapting the included sample inventory file and simply running `bolt plan run splunk_qd` which will install an all-in-one Splunk Enterprise server with addons and point a set of nodes at the instance to begine forwarding logs.
+In all cases you need to have installed and be familiar with [Puppet Bolt](https://puppet.com/docs/bolt/latest/bolt.html) and have SSH access to hosts that you have sudo privileges on so you can run commands as root. Its recommended that you start with a fresh Bolt [project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#project-directories) since the contents of the inventory.yaml file are specific to the plan to be executed. In addition you must add this module **puppetlabs/splunk_qd** and at least the `820a15b` commit of **puppet/splunk** to your project directory `Puppetfile` and run `bolt puppetfile install` to populate your project directory's modules sub-directory.
+
+```
+mod 'puppet-splunk', git: 'https://github.com/voxpupuli/puppet-splunk.git', ref: '820a15b'
+mod 'puppetlabs-splunk_qd', git: 'https://github.com/puppetlabs/puppetlabs-splunk_qd.git', ref: 'master'
+```
 
 ## Usage
 
-Nothing yet...example text kept for my own reference
+#### Scenario 1
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
+**Description:** I have an existing Splunk Enterprise infrastructure and would like to automate the deployment and configuration of the Splunk Universal Forwarder on a set of nodes.
+
+**Steps:**
+
+1. Copy `$boltdir/modules/splunk_qd/examples/inventory/forwarders.yaml` to `$boltdir/inventory.yaml`
+2. Open `inventory.yaml` for editing
+3. Modify *config.ssh.user* to the correct login user for your hosts
+4. Modify the array of nodes so they correspond to the host names or IP addresses of the nodes you wish to manage
+5. The example `inventory.yaml` file has an *addons* variable set under the *forwarders* group which contains a hash of add-ons to be configured when the forwarder is installed, the variable can be deleted and you can skip to step 13 if your goal is to just have the forwarder installed and wish to configure add-ons in a different way later
+6. To install add-ons you must first obtain them from [splunkbase](https://splunkbase.splunk.com/) in .tgz format, the add-on used in the example `inventory.yaml` is [Splunk Add-on for Unix and Linux](https://splunkbase.splunk.com/app/833/)
+7. Once you've downloaded the add-on you need to discover its installed maching name, this is easiliest done by expanding the .tgz archive and the resulting directory name is the add-on's machine name
+8. This machine name is what you'll find on line 31 of the example `inventory.yaml`, **Splunk_TA_nix**
+9. Once you know your add-on's machine name and set it as the value of *name*, set the *filename* key to the archive's original name as it was downloaded from splunkbase
+10. Configure inputs by adding entries into the *inputs* hash, each add-on input is a hash of input name and sub-hash of settings, keys being the setting and values being what the setting should be set to.
+
+    **Example**
+
+    The following entry from `inputs.conf`:
+
+    ```
+    [monitor:///var/log]
+    whitelist = (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+    blacklist = (lastlog|anaconda\.syslog)
+    disabled = false
+    ```
+
+    Becomes the following when converted to the `inventory.yaml` format:
+
+    ```
+    monitor:///var/log:
+      whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+      blacklist: (lastlog|anaconda\.syslog)
+      disabled:  false
+    ```
+11. After you've configured all your add-ons and inputs, write and close `inventory.yaml`
+12. Copy un-expanded add-on archive(s) previously obtained from splunkbase to `$boltdir/modules/splunk_qd/files/addons/`
+13. Now you should be ready of run the following command `bolt plan run splunk_qd manage_search=false search_host=hostname_of_splunk_enterprise_server`
 
 ## Limitations
 
