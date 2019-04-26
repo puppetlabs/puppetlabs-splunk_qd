@@ -191,14 +191,24 @@ name as it was downloaded from splunkbase</p>
 add-on input is a hash of input name and sub-hash of settings, keys being
 the setting and values being what the setting should be set to.</p>
 
-<p><strong>Example</strong> The following entry from <code>inputs.conf</code>:
-<code> [monitor:///var/log] whitelist =
-(\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out) blacklist =
-(lastlog|anaconda\.syslog) disabled = false </code> Becomes the following
-when converted to the <code>inventory.yaml</code> format: <code>
-monitor:///var/log:   whitelist:
-(\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)   blacklist:
-(lastlog|anaconda\.syslog)   disabled:  false </code></p>
+<p><strong>Example</strong></p>
+
+<p>The following entry from <code>inputs.conf</code>:</p>
+
+<pre class="code ruby"><code class="ruby">[monitor:///var/log]
+whitelist = (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+blacklist = (lastlog|anaconda\.syslog)
+disabled = false
+</code></pre>
+
+<p>Becomes the following when converted to the <code>inventory.yaml</code>
+format:</p>
+
+<pre class="code ruby"><code class="ruby">monitor:///var/log:
+  whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+  blacklist: (lastlog|anaconda\.syslog)
+  disabled:  false
+</code></pre>
 </li><li>
 <p>After you&#39;ve configured all your add-ons and inputs, write and close
 <code>inventory.yaml</code></p>
