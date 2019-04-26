@@ -86,12 +86,6 @@ state enforcement.
 <div class="docstring">
   <div class="discussion">
     
-<p>@example Upgrading to a new revision of the Splunk Enterprise and Universal
-Forwarder across a fleet of managed nodes, Splunk Enterprise will be
-upgraded before the Universal Forwarder</p>
-
-<p>bolt plan run splunk_qd version=7.2.6 build=c0bf0f679ce9</p>
-
   </div>
 </div>
 
@@ -111,12 +105,22 @@ upgraded before the Universal Forwarder</p>
     
       
         <p class="example_title"><div class='inline'>
-<p>Deploying the Universal Forwarder and pointing it at an existing Splunk
-Enterprise infrastructure</p>
+<p>Deploying the Universal Forwarder and pointing it at an existing</p>
 </div></p>
       
-      <pre class="example code"><code>
+      <pre class="example code"><code><span class='const'>Splunk</span> <span class='const'>Enterprise</span> <span class='id identifier rubyid_infrastructure'>infrastructure</span>
+
 <span class='id identifier rubyid_bolt'>bolt</span> <span class='id identifier rubyid_plan'>plan</span> <span class='id identifier rubyid_run'>run</span> <span class='id identifier rubyid_splunk_qd'>splunk_qd</span> <span class='id identifier rubyid_search_host'>search_host</span><span class='op'>=</span><span class='id identifier rubyid_splunk0'>splunk0</span><span class='period'>.</span><span class='id identifier rubyid_example'>example</span><span class='period'>.</span><span class='id identifier rubyid_com'>com</span></code></pre>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>Upgrading to a new revision of the Splunk Enterprise and Universal</p>
+</div></p>
+      
+      <pre class="example code"><code>Forwarder across a fleet of managed nodes, Splunk Enterprise will be
+upgraded before the Universal Forwarder
+
+ bolt plan run splunk_qd version=7.2.6 build=c0bf0f679ce9</code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -256,9 +260,6 @@ not defined within the <code>inventory.yaml</code> file</p>
         <pre class="lines">
 
 
-54
-55
-56
 57
 58
 59
@@ -324,10 +325,13 @@ not defined within the <code>inventory.yaml</code> file</p>
 119
 120
 121
-122</pre>
+122
+123
+124
+125</pre>
       </td>
       <td>
-        <pre class="code"><span class="info file"># File 'plans/init.pp', line 54</span>
+        <pre class="code"><span class="info file"># File 'plans/init.pp', line 57</span>
 
 plan splunk_qd(
   String[1] $version               = &#39;7.2.5&#39;,
