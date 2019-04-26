@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.19
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="puppet_class_list_link"
+        href="puppet_class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<h1 id="label-splunk_qd+-28Splunk+Quick+Deploy-29">splunk_qd (Splunk Quick Deploy)</h1>
+
+<p>Quick and simple deployment of Splunk for testing and evaulation.</p>
+
+<p>Module still early in development so goals and code will be changing
+wildly.</p>
+
+<h4 id="label-Table+of+Contents">Table of Contents</h4>
+<ol><li>
+<p><a href="#label-Description">Description</a></p>
+</li><li>
+<p><a href="#label-Setup">Setup - The basics of getting started with splunk_qd</a></p>
+<ul><li>
+<p><a href="#label-What+splunk_qd+affects">What splunk_qd affects</a></p>
+</li><li>
+<p><a href="#label-Setup+requirements">Setup requirements</a></p>
+</li><li>
+<p><a href="#label-Beginning+with+splunk_qd">Beginning with splunk_qd</a></p>
+</li></ul>
+</li><li>
+<p><a href="#label-Usage">Usage - Configuration options and additional
+functionality</a></p>
+</li><li>
+<p><a href="#label-Limitations">Limitations - OS compatibility, etc.</a></p>
+</li><li>
+<p><a href="#label-Development">Development - Guide for contributing to the
+module</a></p>
+</li></ol>
+
+<h2 id="label-Description">Description</h2>
+
+<p>The premise of the module is to provide a facility for bringing online new
+instances of Splunk Enterprise with the option to import data from
+production deployments that enables people to evalate the product, do
+application and addon development, or test a major upgrade. To make sure
+usage is as simple as possible and we can implement a complete deployment
+workflow, we have chosen to focus on Puppet Bolt as opposed to purely
+classic Puppet. We&#39;ll re-use and depend on the Voxpupuli puppet-splunk
+module when ever appropriate so that any installation initially deployed
+through this method can be promoted to a production install and
+continuously maintained by Puppet safely and without many changes if any at
+all.</p>
+
+<p>This means that what you&#39;ll find in this module is a collection of Bolt
+Plans that&#39;ll deploy different components of a Splunk Enterprise
+environment that applies Puppet manifests using Bolt&#39;s agentless apply
+functionality with some glue in between that might not fit well into
+Puppet&#39;s preference for managing desired state but is really only
+applicable for the use case of rapid initial deployment.</p>
+
+<h2 id="label-Setup">Setup</h2>
+
+<h3 id="label-What+splunk_qd+affects">What splunk_qd affects</h3>
+
+<p>It is not intended for this module to take over management of existing
+Splunk Enterprise installations but some exist that might interact with a
+living installation or the plans are generic enough that they could be
+repurposed, e.g. facilitating the backing up of indexes to be restored for
+the purpose of testing and development or onboarding and upgrading the
+universal forwarder.</p>
+
+<h3 id="label-Setup+Requirements">Setup Requirements</h3>
+
+<p>It is required that you have an account on splunkbase are are able to
+obtain add-on or app archives from it if you desire to use splunk_qd to
+install them, there is no way to automate fetching them from splunkbase.</p>
+
+<h3 id="label-Beginning+with+splunk_qd">Beginning with splunk_qd</h3>
+
+<p>In all cases you need to have installed and be familiar with <a
+href="https://puppet.com/docs/bolt/latest/bolt.html">Puppet Bolt</a> and
+have SSH access to hosts that you have sudo privileges on so you can run
+commands as root. Its recommended that you start with a fresh Bolt <a
+href="https://puppet.com/docs/bolt/latest/bolt_project_directories.html#project-directories">project
+directory</a> since the contents of the inventory.yaml file are specific to
+the plan to be executed. In addition you must add this module
+<strong>puppetlabs/splunk_qd</strong> and at least the <code>820a15b</code>
+commit of <strong>puppet/splunk</strong> to your project directory
+<code>Puppetfile</code> and run <code>bolt puppetfile install</code> to
+populate your project directory&#39;s modules sub-directory.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_mod'>mod</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>puppet-splunk</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>git:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://github.com/voxpupuli/puppet-splunk.git</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>ref:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>820a15b</span><span class='tstring_end'>&#39;</span></span>
+<span class='id identifier rubyid_mod'>mod</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>puppetlabs-splunk_qd</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>git:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://github.com/puppetlabs/puppetlabs-splunk_qd.git</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>ref:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>master</span><span class='tstring_end'>&#39;</span></span>
+</code></pre>
+
+<h2 id="label-Usage">Usage</h2>
+
+<h4 id="label-Scenario+1">Scenario 1</h4>
+
+<p><strong>Description:</strong> I have an existing Splunk Enterprise
+infrastructure and would like to automate the deployment and configuration
+of the Splunk Universal Forwarder on a set of nodes.</p>
+
+<p><strong>Steps:</strong> 1. Copy
+<code>$boltdir/modules/splunk_qd/examples/inventory/forwarders.yaml</code>
+to <code>$boltdir/inventory.yaml</code> 2. Open <code>inventory.yaml</code>
+for editing 3. Modify <em>config.ssh.user</em> to the correct login user
+for your hosts 4. Modify the array of nodes so they correspond to the host
+names or IP addresses of the nodes you wish to manage 5. The example
+<code>inventory.yaml</code> file has an <em>addons</em> variable set under
+the <em>forwarders</em> group which contains a hash of add-ons to be
+configured when the forwarder is installed, the variable can be deleted and
+you can skip to step 13 if your goal is to just have the forwarder
+installed and wish to configure add-ons in a different way later 6. To
+install add-ons you must first obtain them from <a
+href="https://splunkbase.splunk.com/">splunkbase</a> in .tgz format, the
+add-on used in the example <code>inventory.yaml</code> is <a
+href="https://splunkbase.splunk.com/app/833/">Splunk Add-on for Unix and
+Linux</a> 7. Once you&#39;ve downloaded the add-on you need to discover its
+installed maching name, this is easiliest done by expanding the .tgz
+archive and the resulting directory name is the add-on&#39;s machine name
+8. This machine name is what you&#39;ll find on line 31 of the example
+<code>inventory.yaml</code>, <strong>Splunk_TA_nix</strong> 9. Once you
+know your add-on&#39;s machine name and set it as the value of
+<em>name</em>, set the <em>filename</em> key to the archive&#39;s original
+name as it was downloaded from splunkbase 10. Configure inputs by adding
+entries into the <em>inputs</em> hash, each add-on input is a hash of input
+name and sub-hash of settings, keys being the setting and values being what
+the setting should be set to.</p>
+
+<p><strong>Example</strong></p>
+
+<p>The following entry from <code>inputs.conf</code>: <code>
+[monitor:///var/log] whitelist =
+(\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out) blacklist =
+(lastlog|anaconda\.syslog) disabled = false </code> Becomes the following
+when converted to the <code>inventory.yaml</code> format: <code>
+monitor:///var/log:   whitelist:
+(\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)   blacklist:
+(lastlog|anaconda\.syslog)   disabled:  false </code> 11. After you&#39;ve
+configured all your add-ons and inputs, write and close
+<code>inventory.yaml</code> 12. Copy un-expanded add-on archive(s)
+previously obtained from splunkbase to
+<code>$boltdir/modules/splunk_qd/files/addons/</code> 13. Now you should be
+ready of run the following command <code>bolt plan run splunk_qd
+managed_search=false
+search_host=hostname_of_splunk_enterprise_server</code></p>
+
+<h2 id="label-Limitations">Limitations</h2>
+
+<p>Be design we are dependent on the puppet-splunk module so limitied to the
+deployment targets is supports and must adhere to its opinions on search
+head, indexer, and forwarder configuration</p>
+
+<h2 id="label-Development">Development</h2>
+
+<p>Contributions welcome just know that you should focus on the Puppet 5
+syntax available in a default intallation of the latest release of Bolt and
+the code cannot depend on the existance of a master or puppetdb.</p>
+</div></div>
+
+      <div id="footer">
+     Generated by <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>.
+</div>
+
+    </div>
+  </body>
+</html>
