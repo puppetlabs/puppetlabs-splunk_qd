@@ -100,8 +100,7 @@ state enforcement.
 <p>Managing Splunk Enterprise and Universal Forwarders</p>
 </div></p>
       
-      <pre class="example code"><code>
-<span class='id identifier rubyid_bolt'>bolt</span> <span class='id identifier rubyid_plan'>plan</span> <span class='id identifier rubyid_run'>run</span> <span class='id identifier rubyid_splunk_qd'>splunk_qd</span></code></pre>
+      <pre class="example code"><code><span class='id identifier rubyid_bolt'>bolt</span> <span class='id identifier rubyid_plan'>plan</span> <span class='id identifier rubyid_run'>run</span> <span class='id identifier rubyid_splunk_qd'>splunk_qd</span></code></pre>
     
       
         <p class="example_title"><div class='inline'>
@@ -109,8 +108,7 @@ state enforcement.
 Enterprise infrastructure</p>
 </div></p>
       
-      <pre class="example code"><code>
-<span class='id identifier rubyid_bolt'>bolt</span> <span class='id identifier rubyid_plan'>plan</span> <span class='id identifier rubyid_run'>run</span> <span class='id identifier rubyid_splunk_qd'>splunk_qd</span> <span class='id identifier rubyid_search_host'>search_host</span><span class='op'>=</span><span class='id identifier rubyid_splunk0'>splunk0</span><span class='period'>.</span><span class='id identifier rubyid_example'>example</span><span class='period'>.</span><span class='id identifier rubyid_com'>com</span></code></pre>
+      <pre class="example code"><code><span class='id identifier rubyid_bolt'>bolt</span> <span class='id identifier rubyid_plan'>plan</span> <span class='id identifier rubyid_run'>run</span> <span class='id identifier rubyid_splunk_qd'>splunk_qd</span> <span class='id identifier rubyid_search_host'>search_host</span><span class='op'>=</span><span class='id identifier rubyid_splunk0'>splunk0</span><span class='period'>.</span><span class='id identifier rubyid_example'>example</span><span class='period'>.</span><span class='id identifier rubyid_com'>com</span></code></pre>
     
       
         <p class="example_title"><div class='inline'>
@@ -118,8 +116,7 @@ Enterprise infrastructure</p>
 Forwarder</p>
 </div></p>
       
-      <pre class="example code"><code>
-bolt plan run splunk_qd version=7.2.6 build=c0bf0f679ce9</code></pre>
+      <pre class="example code"><code>bolt plan run splunk_qd version=7.2.6 build=c0bf0f679ce9</code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -259,6 +256,9 @@ not defined within the <code>inventory.yaml</code> file</p>
         <pre class="lines">
 
 
+51
+52
+53
 54
 55
 56
@@ -324,13 +324,10 @@ not defined within the <code>inventory.yaml</code> file</p>
 116
 117
 118
-119
-120
-121
-122</pre>
+119</pre>
       </td>
       <td>
-        <pre class="code"><span class="info file"># File 'plans/init.pp', line 54</span>
+        <pre class="code"><span class="info file"># File 'plans/init.pp', line 51</span>
 
 plan splunk_qd(
   String[1] $version               = &#39;7.2.5&#39;,
