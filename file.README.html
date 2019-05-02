@@ -218,25 +218,27 @@ format:</p>
 <p>After you&#39;ve configured all your add-ons and inputs, write and close
 <code>inventory.yaml</code></p>
 </li><li>
-<p>Copy the origina add-on archive(s) previously obtained from splunkbase to
+<p>Copy the original add-on archive(s) previously obtained from splunkbase to
 <code>$boltdir/modules/splunk_qd/files/addons/</code></p>
 </li><li>
-<p>Now you should be ready to run the following command: <code>bolt plan run
-splunk_qd manage_search=false
+<p>Now you should be ready to run the following command:</p>
+
+<p><code>bolt plan run splunk_qd manage_search=false
 search_host=hostname_of_splunk_enterprise_server</code></p>
 </li></ol>
 
 <h2 id="label-Limitations">Limitations</h2>
 
-<p>Be design we are dependent on the puppet-splunk module so limitied to the
+<p>By design we are dependent on the puppet-splunk module so limitied to the
 deployment targets is supports and must adhere to its opinions on search
 head, indexer, and forwarder configuration</p>
 
 <h2 id="label-Development">Development</h2>
 
-<p>Contributions welcome just know that you should focus on the Puppet 5
-syntax available in a default intallation of the latest release of Bolt and
-the code cannot depend on the existance of a master or puppetdb.</p>
+<p>All contributions should adhere to Puppet 5 or a greater compatible syntax
+and best practices and work when executed throught the latest release of
+Puppet Bolt, in addition code cannot depend on the existance of a puppet
+server or puppetdb.</p>
 </div></div>
 
       <div id="footer">
