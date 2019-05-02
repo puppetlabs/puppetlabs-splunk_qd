@@ -161,14 +161,15 @@ to <code>$boltdir/inventory.yaml</code></p>
 </li><li>
 <p>Modify <em>config.ssh.user</em> to the correct login user for your hosts</p>
 </li><li>
-<p>Modify the array of nodes so they correspond to the host names or IP
-addresses of the nodes you wish to manage</p>
+<p>Modify the array of nodes so it correspond to the host names or IP
+addresses for the nodes you wish to manage</p>
 </li><li>
 <p>The example <code>inventory.yaml</code> file has an <em>addons</em>
 variable set under the <em>forwarders</em> group which contains a hash of
-add-ons to be configured when the forwarder is installed, the variable can
-be deleted and you can skip to step 13 if your goal is to just have the
-forwarder installed and wish to configure add-ons in a different way later</p>
+add-ons to be configured when the forwarder is installed, it is safe to
+delete the variable and you can skip to step 13 if you wish to
+<strong>ONLY</strong> install the forwarder will configure add-ons in a
+different way later</p>
 </li><li>
 <p>To install add-ons you must first obtain them from <a
 href="https://splunkbase.splunk.com/">splunkbase</a> in .tgz format, the
@@ -176,20 +177,24 @@ add-on used in the example <code>inventory.yaml</code> is <a
 href="https://splunkbase.splunk.com/app/833/">Splunk Add-on for Unix and
 Linux</a></p>
 </li><li>
-<p>Once you&#39;ve downloaded the add-on you need to discover its installed
-maching name, this is easiliest done by expanding the .tgz archive and the
-resulting directory name is the add-on&#39;s machine name</p>
+<p>Once you&#39;ve downloaded the add-on you need to discover its installation
+name, this is done by expanding the .tgz archive and opening the
+<code>app.manifest</code> within the resulting directory and noting the
+value of <em>id.name</em></p>
 </li><li>
-<p>This machine name is what you&#39;ll find on line 31 of the example
-<code>inventory.yaml</code>, <strong>Splunk_TA_nix</strong></p>
+<p>That installation name for the <strong>Splunk Add-on for Unix and
+Linux</strong> obtained in step 7 can be found on line 31 of the example
+<code>inventory.yaml</code>, it is set to <strong>Splunk_TA_nix</strong></p>
 </li><li>
-<p>Once you know your add-on&#39;s machine name and set it as the value of
-<em>name</em>, set the <em>filename</em> key to the archive&#39;s original
-name as it was downloaded from splunkbase</p>
+<p>Once you know your add-on&#39;s installation name and have set it as the
+value of <em>name</em>, set the <em>filename</em> key to the name of the
+original archive downloaded from splunkbase</p>
 </li><li>
 <p>Configure inputs by adding entries into the <em>inputs</em> hash, each
 add-on input is a hash of input name and sub-hash of settings, keys being
-the setting and values being what the setting should be set to.</p>
+the setting and values being what the setting should be set to.
+(<strong>DON&#39;T STOP HERE:</strong> There are a couple more steps below
+the following example)</p>
 
 <p><strong>Example</strong></p>
 
@@ -213,10 +218,10 @@ format:</p>
 <p>After you&#39;ve configured all your add-ons and inputs, write and close
 <code>inventory.yaml</code></p>
 </li><li>
-<p>Copy un-expanded add-on archive(s) previously obtained from splunkbase to
+<p>Copy the origina add-on archive(s) previously obtained from splunkbase to
 <code>$boltdir/modules/splunk_qd/files/addons/</code></p>
 </li><li>
-<p>Now you should be ready of run the following command <code>bolt plan run
+<p>Now you should be ready to run the following command: <code>bolt plan run
 splunk_qd manage_search=false
 search_host=hostname_of_splunk_enterprise_server</code></p>
 </li></ol>
