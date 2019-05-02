@@ -11,6 +11,12 @@ nodes:
     alias: search_head
     vars:
       addons:
+        - name; splunk_httpinput
+          package_manage: false
+          inputs;
+            http:
+              enabledSSL: true
+              disabled: false
         - name: Splunk_TA_nix
           filename: splunk-add-on-for-unix-and-linux_602.tgz
           inputs:
@@ -25,6 +31,19 @@ nodes:
               disabled:   false
         - name: splunk_app_for_nix
           filename: splunk-app-for-unix-and-linux_525.tgz
+        - name: TA-puppet-tasks-actionable
+          filename: puppet-tasks-actionable-alerts-for-splunk_101.tgz
+        - name: TA-puppet-report-viewer
+          filename: puppet-report-viewer_135.tgz
+          inputs:
+            http://puppet:summary
+              sourcetype: puppet:summary
+              token: 00000000-0000-0000-0000-000000000000
+              disabled:  false
+            http://puppet:detailed
+              sourcetype: puppet:detailed
+              token: 00000000-0000-0000-0000-000000000000
+              disabled:  false
   - name: ec2-54-214-200-239.us-west-2.compute.amazonaws.com
     alias: forwarder0
   - name: ec2-54-244-108-52.us-west-2.compute.amazonaws.com
