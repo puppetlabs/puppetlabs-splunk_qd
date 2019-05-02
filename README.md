@@ -52,13 +52,13 @@ mod 'puppetlabs-splunk_qd', git: 'https://github.com/puppetlabs/puppetlabs-splun
 1. Copy `$boltdir/modules/splunk_qd/examples/inventory/forwarders.yaml` to `$boltdir/inventory.yaml`
 2. Open `inventory.yaml` for editing
 3. Modify *config.ssh.user* to the correct login user for your hosts
-4. Modify the array of nodes so they correspond to the host names or IP addresses of the nodes you wish to manage
-5. The example `inventory.yaml` file has an *addons* variable set under the *forwarders* group which contains a hash of add-ons to be configured when the forwarder is installed, the variable can be deleted and you can skip to step 13 if your goal is to just have the forwarder installed and wish to configure add-ons in a different way later
+4. Modify the array of nodes so it correspond to the host names or IP addresses for the nodes you wish to manage
+5. The example `inventory.yaml` file has an *addons* variable set under the *forwarders* group which contains a hash of add-ons to be configured when the forwarder is installed, it is safe to delete the variable and you can skip to step 13 if you wish to **ONLY** install the forwarder will configure add-ons in a different way later
 6. To install add-ons you must first obtain them from [splunkbase](https://splunkbase.splunk.com/) in .tgz format, the add-on used in the example `inventory.yaml` is [Splunk Add-on for Unix and Linux](https://splunkbase.splunk.com/app/833/)
-7. Once you've downloaded the add-on you need to discover its installed maching name, this is easiliest done by expanding the .tgz archive and the resulting directory name is the add-on's machine name
-8. This machine name is what you'll find on line 31 of the example `inventory.yaml`, **Splunk_TA_nix**
-9. Once you know your add-on's machine name and set it as the value of *name*, set the *filename* key to the archive's original name as it was downloaded from splunkbase
-10. Configure inputs by adding entries into the *inputs* hash, each add-on input is a hash of input name and sub-hash of settings, keys being the setting and values being what the setting should be set to.
+7. Once you've downloaded the add-on you need to discover its installation name, this is done by expanding the .tgz archive and opening the `app.manifest` within the resulting directory and noting the value of *id.name*
+8. That installation name for the **Splunk Add-on for Unix and Linux** obtained in step 7 can be found on line 31 of the example `inventory.yaml`, it is set to **Splunk_TA_nix**
+9. Once you know your add-on's installation name and have set it as the value of *name*, set the *filename* key to the name of the original archive downloaded from splunkbase
+10. Configure inputs by adding entries into the *inputs* hash, each add-on input is a hash of input name and sub-hash of settings, keys being the setting and values being what the setting should be set to. (**DON'T STOP HERE:** There are a couple more steps below the following example)
 
     **Example**
 
@@ -80,8 +80,9 @@ mod 'puppetlabs-splunk_qd', git: 'https://github.com/puppetlabs/puppetlabs-splun
       disabled:  false
     ```
 11. After you've configured all your add-ons and inputs, write and close `inventory.yaml`
-12. Copy un-expanded add-on archive(s) previously obtained from splunkbase to `$boltdir/modules/splunk_qd/files/addons/`
-13. Now you should be ready of run the following command `bolt plan run splunk_qd manage_search=false search_host=hostname_of_splunk_enterprise_server`
+12. Copy the origina add-on archive(s) previously obtained from splunkbase to `$boltdir/modules/splunk_qd/files/addons/`
+13. Now you should be ready to run the following command:
+    `bolt plan run splunk_qd manage_search=false search_host=hostname_of_splunk_enterprise_server`
 
 ## Limitations
 
