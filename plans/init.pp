@@ -89,6 +89,7 @@ plan splunk_qd(
         ssl           => $ssl
       }
     }
+    notice("Splunk is now ready at http://${$search_head[0].host}:8000")
   }
 
   # Everything from here on down is pretty similar to what's above with a couple
