@@ -70,16 +70,19 @@ wildly.</p>
 <p><a href="#label-Description">Description</a></p>
 </li><li>
 <p><a href="#label-Setup">Setup - The basics of getting started with splunk_qd</a></p>
-<ul><li>
+</li><li>
 <p><a href="#label-What+splunk_qd+affects">What splunk_qd affects</a></p>
 </li><li>
 <p><a href="#label-Setup+requirements">Setup requirements</a></p>
 </li><li>
 <p><a href="#label-Beginning+with+splunk_qd">Beginning with splunk_qd</a></p>
-</li></ul>
 </li><li>
 <p><a href="#label-Usage">Usage - Configuration options and additional
 functionality</a></p>
+</li><li>
+<p><a href="#label-Scenario+1">Scenario 1</a></p>
+</li><li>
+<p><a href="#label-Scenario+2">Scenario 2</a></p>
 </li><li>
 <p><a href="#label-Limitations">Limitations - OS compatibility, etc.</a></p>
 </li><li>
@@ -161,8 +164,11 @@ to <code>$boltdir/inventory.yaml</code></p>
 </li><li>
 <p>Modify <em>config.ssh.user</em> to the correct login user for your hosts</p>
 </li><li>
-<p>Modify the array of nodes so it correspond to the host names or IP
-addresses for the nodes you wish to manage</p>
+<p>Modify the array of nodes so it correspond to the fully qualified domain
+names or IP addresses for the nodes you wish to manage</p>
+</li><li>
+<p>Modify the forwarders group to ensure all node names or aliases have been
+added</p>
 </li><li>
 <p>The example <code>inventory.yaml</code> file has an <em>addons</em>
 variable set under the <em>forwarders</em> group which contains a hash of
@@ -195,6 +201,7 @@ add-on input is a hash of input name and sub-hash of settings, keys being
 the setting and values being what the setting should be set to.
 (<strong>DON&#39;T STOP HERE:</strong> There are a couple more steps below
 the following example)</p>
+</li></ol>
 
 <p><strong>Example</strong></p>
 
@@ -210,11 +217,11 @@ disabled = false
 format:</p>
 
 <pre class="code ruby"><code class="ruby">monitor:///var/log:
-  whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
-  blacklist: (lastlog|anaconda\.syslog)
-  disabled:  false
+whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+blacklist: (lastlog|anaconda\.syslog)
+disabled:  false
 </code></pre>
-</li><li>
+<ol><li>
 <p>After you&#39;ve configured all your add-ons and inputs, write and close
 <code>inventory.yaml</code></p>
 </li><li>
@@ -222,10 +229,106 @@ format:</p>
 <code>$boltdir/modules/splunk_qd/files/addons/</code></p>
 </li><li>
 <p>Now you should be ready to run the following command:</p>
+</li></ol>
 
 <p><code>bolt plan run splunk_qd manage_search=false
-search_host=hostname_of_splunk_enterprise_server</code></p>
+search_host=fqdn_of_splunk_enterprise_server</code></p>
+
+<h4 id="label-Scenario+2">Scenario 2</h4>
+
+<p><strong>Description:</strong> I want to deploy and configure a fresh
+installation of Splunk Enterprise and configure a set of nodes running the
+Splunk Universal Forwarder to send their generaged machine data to the
+fresh install.</p>
+
+<p><strong>Steps:</strong></p>
+<ol><li>
+<p>Copy <code>$boltdir/modules/splunk_qd/examples/inventory/both.yaml</code>
+to <code>$boltdir/inventory.yaml</code></p>
+</li><li>
+<p>Open <code>inventory.yaml</code> for editing</p>
+</li><li>
+<p>Modify <em>config.ssh.user</em> to the correct login user for your hosts</p>
+</li><li>
+<p>Find the node with the <em>alias</em> <strong>search_head</strong> and
+update the name to be the fully qualified domain name or IP address of the
+node you want to install Splunk Enterprise onto</p>
+</li><li>
+<p>Additionally modify the array of nodes so it also contains the fully
+qualified domain name or IP addresses for the nodes you wish to manage the
+Splunk Universal Forwarder on</p>
+</li><li>
+<p>The example <code>inventory.yaml</code> file has an <em>addons</em>
+variable set under the <strong>search_head</strong> node and the
+<strong>forwarders</strong> group which contains a hash of add-ons or apps
+to be configured when the either is installed, it is safe to delete the
+variable and you can skip to step 15 if you wish to <strong>ONLY</strong>
+install the software and will configure add-ons and apps in a different way
+later</p>
+</li><li>
+<p>To install add-ons or apps you must first obtain them from <a
+href="https://splunkbase.splunk.com/">splunkbase</a> in .tgz format, the
+add-ons used in the example <code>inventory.yaml</code> is <a
+href="https://splunkbase.splunk.com/app/833/">Splunk Add-on for Unix and
+Linux</a> and the app is the <a
+href="https://splunkbase.splunk.com/app/273/">Splunk App for Unix and
+Linux</a></p>
+</li><li>
+<p>Once you&#39;ve downloaded the ether an add-on or app you need to discover
+its installation name, this is done by expanding the .tgz archive and
+opening the <code>app.manifest</code> within the resulting directory and
+noting the value of <em>info.id.name</em></p>
+</li><li>
+<p>That installation name for the <strong>Splunk Add-on for Unix and
+Linux</strong> obtained in step 7 can be found on line 14 and 49 of the
+example <code>inventory.yaml</code>, it is set to
+<strong>Splunk_TA_nix</strong></p>
+</li><li>
+<p>That installation name for the <strong>Splunk App for Unix and
+Linux</strong> obtained in step 7 can be found on line 26 of the example
+<code>inventory.yaml</code>, it is set to
+<strong>splunk_app_for_nix</strong></p>
+</li><li>
+<p>Once you know your add-on and app&#39;s installation name and have set it
+as the value of <em>name</em>, set the <em>filename</em> key to the name of
+the original archive downloaded from splunkbase</p>
+</li><li>
+<p>Configure inputs by adding entries into the <em>inputs</em> hash, each
+add-on input is a hash of input name and sub-hash of settings, keys being
+the setting and values being what the setting should be set to.
+(<strong>DON&#39;T STOP HERE:</strong> There are a couple more steps below
+the following example)</p>
 </li></ol>
+
+<p><strong>Example</strong></p>
+
+<p>The following entry from <code>inputs.conf</code>:</p>
+
+<pre class="code ruby"><code class="ruby">[monitor:///var/log]
+whitelist = (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+blacklist = (lastlog|anaconda\.syslog)
+disabled = false
+</code></pre>
+
+<p>Becomes the following when converted to the <code>inventory.yaml</code>
+format:</p>
+
+<pre class="code ruby"><code class="ruby">monitor:///var/log:
+whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+blacklist: (lastlog|anaconda\.syslog)
+disabled:  false
+</code></pre>
+<ol><li>
+<p>After you&#39;ve configured all your add-ons, apps, and inputs, write and
+close <code>inventory.yaml</code></p>
+</li><li>
+<p>Copy the original add-on and app archive(s) previously obtained from
+splunkbase to <code>$boltdir/modules/splunk_qd/files/addons/</code></p>
+</li><li>
+<p>Now you should be ready to run the following command:</p>
+</li></ol>
+
+<p><code>bolt plan run splunk_qd</code></p>
 
 <h2 id="label-Limitations">Limitations</h2>
 
