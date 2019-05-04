@@ -36,6 +36,22 @@ class splunk_qd::profile::forward(
         inputs            => $addon['inputs'],
         notify            =>  Class['splunk::forwarder::service'],
       }
+
+      # If the add-on has a set of settings that are set outside of inputs.conf
+      # then they should be added to the `additional_settings` hash,
+      # puppet/splunk doesn't currently understand all files that configuration
+      # can be storred in so this is implemented with raw usage of ini_setting.
+      if $addon['additional_settings'] {
+        $addon['additional_settings'].each |$setting, $values| {
+          ini_setting { "${addon['name']}_${values['filename']}_${values['section']}_${setting}":
+            ensure         => present,
+            path           =>  "${splunk::params::forwarder_homedir}/etc/apps/${addon['name']}/local/${values['filename']}",
+            section        => $values['section'],
+            setting        => $setting,
+            value          => $values['value'],
+          }
+        }
+      }
     }
   }
 }
