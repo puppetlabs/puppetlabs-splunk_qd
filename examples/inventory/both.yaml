@@ -23,8 +23,22 @@ nodes:
               source:     Unix:Uptime
               sourcetype: Unix:Uptime
               disabled:   false
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
+            is_visible:
+              filename: app.conf
+              section: ui
+              value: false
         - name: splunk_app_for_nix
           filename: splunk-app-for-unix-and-linux_525.tgz
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
   - name: ec2-54-214-200-239.us-west-2.compute.amazonaws.com
     alias: forwarder0
   - name: ec2-54-244-108-52.us-west-2.compute.amazonaws.com
@@ -58,3 +72,8 @@ groups:
               source:     Unix:Uptime
               sourcetype: Unix:Uptime
               disabled:   false
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
