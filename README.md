@@ -1,9 +1,9 @@
 
 # splunk_qd (Splunk Quick Deploy)
 
-Quick and simple deployment of Splunk for testing and evaulation.
+Lightning-fast deployment of Splunk for simple testing and evaluation. 
 
-Module still early in development so goals and code will be changing wildly.
+This code is experimental and unsupported but rests upon the production-grade foundation of the Puppet Approved module [puppet/splunk](https://forge.puppet.com/puppet/splunk).
 
 #### Table of Contents
 
@@ -53,14 +53,13 @@ mod 'puppetlabs-splunk_qd', git: 'https://github.com/puppetlabs/puppetlabs-splun
 1. Copy `$boltdir/modules/splunk_qd/examples/inventory/forwarders.yaml` to `$boltdir/inventory.yaml`
 2. Open `inventory.yaml` for editing
 3. Modify *config.ssh.user* to the correct login user for your hosts
-4. Modify the array of nodes so it correspond to the fully qualified domain names or IP addresses for the nodes you wish to manage
-5. Modify the forwarders group to ensure all node names or aliases have been added
-6. The example `inventory.yaml` file has an *addons* variable set under the *forwarders* group which contains a hash of add-ons to be configured when the forwarder is installed, it is safe to delete the variable and you can skip to step 13 if you wish to **ONLY** install the forwarder will configure add-ons in a different way later
-7. To install add-ons you must first obtain them from [splunkbase](https://splunkbase.splunk.com/) in .tgz format, the add-on used in the example `inventory.yaml` is [Splunk Add-on for Unix and Linux](https://splunkbase.splunk.com/app/833/)
-8. Once you've downloaded the add-on you need to discover its installation name, this is done by expanding the .tgz archive and opening the `app.manifest` within the resulting directory and noting the value of *info.id.name*
-9. That installation name for the **Splunk Add-on for Unix and Linux** obtained in step 7 can be found on line 31 of the example `inventory.yaml`, it is set to **Splunk_TA_nix**
-10. Once you know your add-on's installation name and have set it as the value of *name*, set the *filename* key to the name of the original archive downloaded from splunkbase
-11. Configure inputs by adding entries into the *inputs* hash, each add-on input is a hash of input name and sub-hash of settings, keys being the setting and values being what the setting should be set to. (**DON'T STOP HERE:** There are a couple more steps below the following example)
+4. Modify the array of nodes so they correspond to the host names or IP addresses of the nodes you wish to manage
+5. The example `inventory.yaml` file has an *addons* variable set under the *forwarders* group which contains a hash of add-ons to be configured when the forwarder is installed, the variable can be deleted and you can skip to step 13 if your goal is to just have the forwarder installed and wish to configure add-ons in a different way later
+6. To install add-ons you must first obtain them from [splunkbase](https://splunkbase.splunk.com/) in .tgz format, the add-on used in the example `inventory.yaml` is [Splunk Add-on for Unix and Linux](https://splunkbase.splunk.com/app/833/)
+7. Once you've downloaded the add-on you need to discover its installed maching name, this is easiliest done by expanding the .tgz archive and the resulting directory name is the add-on's machine name which you can confirm with metadata from the directories app.manifest, info.id.name. 
+8. This machine name is what you'll find on line 31 of the example `inventory.yaml`, **Splunk_TA_nix**
+9. Once you know your add-on's machine name and set it as the value of *name*, set the *filename* key to the archive's original name as it was downloaded from splunkbase
+10. Configure inputs by adding entries into the *inputs* hash, each add-on input is a hash of input name and sub-hash of settings, keys being the setting and values being what the setting should be set to.
 
 **Example**
 
@@ -81,55 +80,9 @@ whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
 blacklist: (lastlog|anaconda\.syslog)
 disabled:  false
 ```
-12. After you've configured all your add-ons and inputs, write and close `inventory.yaml`
-13. Copy the original add-on archive(s) previously obtained from splunkbase to `$boltdir/modules/splunk_qd/files/addons/`
-14. Now you should be ready to run the following command:
-
-`bolt plan run splunk_qd manage_search=false search_host=fqdn_of_splunk_enterprise_server`
-
-#### Scenario 2
-
-**Description:** I want to deploy and configure a fresh installation of Splunk Enterprise and configure a set of nodes running the Splunk Universal Forwarder to send their generaged machine data to the fresh install.
-
-**Steps:**
-
-1. Copy `$boltdir/modules/splunk_qd/examples/inventory/both.yaml` to `$boltdir/inventory.yaml`
-2. Open `inventory.yaml` for editing
-3. Modify *config.ssh.user* to the correct login user for your hosts
-4. Find the node with the *alias* **search_head** and update the name to be the fully qualified domain name or IP address of the node you want to install Splunk Enterprise onto
-5. Additionally modify the array of nodes so it also contains the fully qualified domain name or IP addresses for the nodes you wish to manage the Splunk Universal Forwarder on
-6. The example `inventory.yaml` file has an *addons* variable set under the **search_head** node and the **forwarders** group which contains a hash of add-ons or apps to be configured when the either is installed, it is safe to delete the variable and you can skip to step 15 if you wish to **ONLY** install the software and will configure add-ons and apps in a different way later
-7. To install add-ons or apps you must first obtain them from [splunkbase](https://splunkbase.splunk.com/) in .tgz format, the add-ons used in the example `inventory.yaml` is [Splunk Add-on for Unix and Linux](https://splunkbase.splunk.com/app/833/) and the app is the [Splunk App for Unix and Linux](https://splunkbase.splunk.com/app/273/)
-8. Once you've downloaded the ether an add-on or app you need to discover its installation name, this is done by expanding the .tgz archive and opening the `app.manifest` within the resulting directory and noting the value of *info.id.name*
-9. That installation name for the **Splunk Add-on for Unix and Linux** obtained in step 7 can be found on line 14 and 49 of the example `inventory.yaml`, it is set to **Splunk_TA_nix**
-10. That installation name for the **Splunk App for Unix and Linux** obtained in step 7 can be found on line 26 of the example `inventory.yaml`, it is set to **splunk_app_for_nix**
-11. Once you know your add-on and app's installation name and have set it as the value of *name*, set the *filename* key to the name of the original archive downloaded from splunkbase
-12. Configure inputs by adding entries into the *inputs* hash, each add-on input is a hash of input name and sub-hash of settings, keys being the setting and values being what the setting should be set to. (**DON'T STOP HERE:** There are a couple more steps below the following example)
-
-**Example**
-
-The following entry from `inputs.conf`:
-
-```
-[monitor:///var/log]
-whitelist = (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
-blacklist = (lastlog|anaconda\.syslog)
-disabled = false
-```
-
-Becomes the following when converted to the `inventory.yaml` format:
-
-```
-monitor:///var/log:
-whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
-blacklist: (lastlog|anaconda\.syslog)
-disabled:  false
-```
-13. After you've configured all your add-ons, apps, and inputs, write and close `inventory.yaml`
-14. Copy the original add-on and app archive(s) previously obtained from splunkbase to `$boltdir/modules/splunk_qd/files/addons/`
-15. Now you should be ready to run the following command:
-
-`bolt plan run splunk_qd`
+11. After you've configured all your add-ons and inputs, write and close `inventory.yaml`
+12. Copy un-expanded add-on archive(s) previously obtained from splunkbase to `$boltdir/modules/splunk_qd/files/addons/`
+13. Now you should be ready of run the following command `bolt plan run splunk_qd manage_search=false search_host=hostname_of_splunk_enterprise_server`
 
 ## Limitations
 
