@@ -55,6 +55,7 @@ plan splunk_qd(
   Boolean $manage_addons           = true,
   Boolean $manage_forwarders       = true,
   Boolean $manage_search           = true,
+  Boolean $web_ssl                 = false,
 ) {
 
   # Alwasy look this up since we have a use for the data defined with it even if
@@ -84,6 +85,7 @@ plan splunk_qd(
         build         => $build,
         manage_addons => $manage_addons,
         addons        => $addons,
+        web_ssl       => $web_ssl,
       }
     }
   }
