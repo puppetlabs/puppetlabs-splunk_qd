@@ -20,6 +20,10 @@ class splunk_qd::profile::search(
   class { 'splunk::enterprise':
     package_ensure  => latest,
     manage_password => true,
+    web_httpport    =>  $web_ssl ? {
+      true    => 443,
+      default => 8000,
+    }
   }
 
   if $web_ssl {
