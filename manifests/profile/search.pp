@@ -35,10 +35,6 @@ class splunk_qd::profile::search(
     }
   }
 
-  if $web_ssl {
-    include splunk_qd::profile::search::ssl
-  }
-
   # Its safe to interate over an empty array, effectively a noop if you haven't
   # passed in a list of addons to be managed but if you have and just simply
   # don't wish to manage them temporarily then set $manage_addons to false.
