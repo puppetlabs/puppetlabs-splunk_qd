@@ -4,6 +4,7 @@ class splunk_qd::profile::search(
   String  $build          = undef,
   Array   $addons         = [],
   Boolean $web_ssl        = false,
+  Hash    $ssl            = {}
 ) {
 
   # Declaring Class[splunk:params] here is how control which version of Splunk
@@ -27,7 +28,11 @@ class splunk_qd::profile::search(
   }
 
   if $web_ssl {
-    include splunk_qd::profile::search::ssl
+    class { 'splunk_qd::profile::search::ssl':
+      mode               => $ssl['mode'],
+      registration_email => $ssl['registration_email'],
+      external_fqdn      => $ssl['external_fqdn'],
+    }
   }
 
   # Its safe to interate over an empty array, effectively a noop if you haven't

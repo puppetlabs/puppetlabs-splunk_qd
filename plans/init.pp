@@ -86,6 +86,7 @@ plan splunk_qd(
         manage_addons => $manage_addons,
         addons        => $addons,
         web_ssl       => $web_ssl,
+        ssl           => $ssl
       }
     }
   }
