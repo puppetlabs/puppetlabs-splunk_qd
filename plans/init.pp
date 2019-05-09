@@ -73,7 +73,7 @@ plan splunk_qd(
 
     # Function informing Bolt that we are going to execute agentless Puppet
     # code on a remote set of nodes
-    apply($search_head) {
+    $manage_search_results = apply($search_head) {
       # Bolt makes it super easy to follow existing best practices and the all
       # great pieces of content found out in out broad ecosystem, as we've done
       # here building a simple profile for manager Splunk Enterprise which in
@@ -89,35 +89,52 @@ plan splunk_qd(
         ssl           => $ssl
       }
     }
-    notice("Splunk is now ready at http://${$search_head[0].host}:8000")
+    if $manage_search_results.first.report['status'] == 'changed' {
+      if $web_ssl {
+        if $search_head[0].vars['ssl']['external_fqdn'] {
+          $success_url = "https://${search_head[0].vars['ssl']['external_fqdn']}"
+        } else {
+          $success_url = "https://${search_head[0].host}"
+        }
+      } else {
+        $succes_url = "http://${search_head[0].host}:8000"
+      }
+      notice("Splunk Enterprise is now ready at ${success_url}")
+    }
   }
+
+
 
   # Everything from here on down is pretty similar to what's above with a couple
   # exceptions...
   if $manage_forwarders {
+    if ! defined('$manage_search_results') or $manage_search_results.ok {
 
-    $forwarders = get_targets('forwarders')
+      $forwarders = get_targets('forwarders')
 
-    # Checks to see if search_host was set on the command line and if so
-    # prioritizes is value, then copies it into a private variable to be passed
-    # into our forwarder profile. If the variable was not set then it attempts
-    # to derive it from the search_head object found in the inventory.yaml file.
-    if $search_host {
-      $_search_host = $search_host
-    } else {
-      $_search_host = $search_head[0].host
-    }
-
-    $forwarders.apply_prep
-
-    apply($forwarders) {
-      class { 'splunk_qd::profile::forward':
-        version       => $version,
-        build         => $build,
-        manage_addons => $manage_addons,
-        addons        => $addons,
-        search_host   => $_search_host,
+      # Checks to see if search_host was set on the command line and if so
+      # prioritizes is value, then copies it into a private variable to be passed
+      # into our forwarder profile. If the variable was not set then it attempts
+      # to derive it from the search_head object found in the inventory.yaml file.
+      if $search_host {
+        $_search_host = $search_host
+      } else {
+        $_search_host = $search_head[0].host
       }
+
+      $forwarders.apply_prep
+
+      apply($forwarders) {
+        class { 'splunk_qd::profile::forward':
+          version       => $version,
+          build         => $build,
+          manage_addons => $manage_addons,
+          addons        => $addons,
+          search_host   => $_search_host,
+        }
+      }
+    } else {
+      fail_plan('Universal Forwarder configuration skipped due to previous failure configuring Splunk Enterprise')
     }
   }
 }
