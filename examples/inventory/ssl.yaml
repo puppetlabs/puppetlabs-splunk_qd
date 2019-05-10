@@ -1,0 +1,83 @@
+---
+config:
+  transport: ssh
+  ssh:
+    user: ody
+    host-key-check: false
+    run-as: root
+
+nodes:
+  - name: 35.230.40.46
+    alias: search_head
+    vars:
+      ssl:
+        mode: letsencrypt
+        reg_email: cody+splunk-qd@puppet.com
+        reg_fqdn: splunk-qd-head.gcp.herrig.es
+      addons:
+        - name: Splunk_TA_nix
+          filename: splunk-add-on-for-unix-and-linux_602.tgz
+          inputs:
+            monitor:///var/log:
+              whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+              blacklist: (lastlog|anaconda\.syslog)
+              disabled:  false
+            script://./bin/uptime.sh:
+              interval:   86400
+              source:     Unix:Uptime
+              sourcetype: Unix:Uptime
+              disabled:   false
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
+            is_visible:
+              filename: app.conf
+              section: ui
+              value: false
+        - name: splunk_app_for_nix
+          filename: splunk-app-for-unix-and-linux_525.tgz
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
+  - name: 35.197.34.253
+    alias: forwarder0
+  - name: 35.233.187.85
+    alias: forwarder1
+  - name: 35.247.115.87
+    alias: forwarder2
+  - name: 35.185.237.182
+    alias: forwarder3
+  - name: 34.83.16.51
+    alias: forwarder4
+
+groups:
+  - name: forwarders
+    nodes:
+      - forwarder0
+      - forwarder1
+      - forwarder2
+      - forwarder3
+      - forwarder4
+    vars:
+      addons:
+        - name: Splunk_TA_nix
+          filename: splunk-add-on-for-unix-and-linux_602.tgz
+          inputs:
+            monitor:///var/log:
+              whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+              blacklist: (lastlog|anaconda\.syslog)
+              disabled:  false
+            script://./bin/uptime.sh:
+              interval:   86400
+              source:     Unix:Uptime
+              sourcetype: Unix:Uptime
+              disabled:   false
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
