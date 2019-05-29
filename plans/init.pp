@@ -63,6 +63,10 @@
 #   Sets the common name on the generated and signed certificate when using the
 #   `letsencrypt` SSL provider
 #
+# @param addon_source_path
+#   Used for defining a source path that is different than the default in module
+#   path
+#
 plan splunk_qd(
   String[1] $version                                      = '7.2.5',
   String[1] $build                                        = '088f49762779',
@@ -74,12 +78,12 @@ plan splunk_qd(
   Optional[Enum['internal', 'letsencrypt']] $web_ssl_mode = undef,
   Optional[String[1]] $web_ssl_reg_email                  = undef,
   Optional[String[1]] $web_ssl_reg_fqdn                   = undef,
+  Optional[String[1]] $addon_source_path                  = undef,
 ) {
 
   # Alwasy look this up since we have a use for the data defined with it even if
   # we do not plan on managing the node and its fine if if returns nil
   $search_head = get_targets('search_head')
-
 
   # Conditional to disable search node management
   if $manage_search {
@@ -101,6 +105,7 @@ plan splunk_qd(
     # Function informing Bolt that we are going to execute agentless Puppet
     # code on a remote set of nodes
     $manage_search_results = apply($search_head) {
+
       # Bolt makes it super easy to follow existing best practices and the all
       # great pieces of content found out in out broad ecosystem, as we've done
       # here building a simple profile for manager Splunk Enterprise which in
@@ -108,12 +113,13 @@ plan splunk_qd(
       # reused again by a full Puppet Enterprise installation capable of
       # continuous enforcement
       class { 'splunk_qd::profile::search':
-        version       => $version,
-        build         => $build,
-        manage_addons => $manage_addons,
-        addons        => $addons,
-        web_ssl       => $web_ssl,
-        ssl           => defined('$_ssl') ? { true => $_ssl, default => {} },
+        version           => $version,
+        build             => $build,
+        manage_addons     => $manage_addons,
+        addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
+        addons            => $addons,
+        web_ssl           => $web_ssl,
+        ssl               => defined('$_ssl') ? { true => $_ssl, default => {} },
       }
     }
     if $manage_search_results.first.report['status'] == 'changed' {
@@ -151,11 +157,12 @@ plan splunk_qd(
 
       apply($forwarders) {
         class { 'splunk_qd::profile::forward':
-          version       => $version,
-          build         => $build,
-          manage_addons => $manage_addons,
-          addons        => $addons,
-          search_host   => $_search_host,
+          version           => $version,
+          build             => $build,
+          manage_addons     => $manage_addons,
+          addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
+          addons            => $addons,
+          search_host       => $_search_host,
         }
       }
     } else {
