@@ -1,10 +1,11 @@
 class splunk_qd::profile::search(
-  Boolean $manage_addons = true,
-  Array $addons          = [],
-  Boolean $web_ssl       = false,
-  Hash $ssl              = {},
+  Boolean $manage_addons                = true,
+  Array $addons                         = [],
+  Boolean $web_ssl                      = false,
+  Hash $ssl                             = {},
   String[1] $version,
   String[1] $build,
+  Optional[String[1]] $addon_source_path = undef
 ) {
 
   # Declaring Class[splunk:params] here is how control which version of Splunk
@@ -35,13 +36,19 @@ class splunk_qd::profile::search(
     }
   }
 
+  if $addon_source_path {
+    $_addon_source_path = $addon_source_path
+  } else {
+    $_addon_source_path = 'puppet:///modules/splunk_qd/addons'
+  }
+
   # Its safe to interate over an empty array, effectively a noop if you haven't
   # passed in a list of addons to be managed but if you have and just simply
   # don't wish to manage them temporarily then set $manage_addons to false.
   if $manage_addons {
     $addons.each |$addon| {
       splunk::addon { $addon['name']:
-        splunkbase_source => "puppet:///modules/splunk_qd/addons/${addon['filename']}",
+        splunkbase_source => "${_addon_source_path}/${addon['filename']}",
         inputs            => $addon['inputs'],
         notify            =>  Class['splunk::enterprise::service'],
       }
