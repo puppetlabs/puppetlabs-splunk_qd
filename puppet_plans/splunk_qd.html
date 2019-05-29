@@ -239,6 +239,82 @@ not defined within the <code>inventory.yaml</code> file</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>web_ssl</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>To configure Splunk Enterprise Web with SSL and redirect traffic on port 80
+to 443</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>web_ssl_mode</span>
+      
+      
+        <span class='type'>(<tt>Optional[Enum['internal', 'letsencrypt']]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Switch between the two available SSL providers supported by the module</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>web_ssl_reg_email</span>
+      
+      
+        <span class='type'>(<tt>Optional[String[1]]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>When using the <code>letsencrypt</code> SSL provider you must provide an
+email address to be used as an account that the certificate will be
+registered to</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>web_ssl_reg_fqdn</span>
+      
+      
+        <span class='type'>(<tt>Optional[String[1]]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Sets the common name on the generated and signed certificate when using the
+<code>letsencrypt</code> SSL provider</p>
+</div>
+      
+    </li>
+  
 </ul>
 
 
@@ -256,21 +332,6 @@ not defined within the <code>inventory.yaml</code> file</p>
         <pre class="lines">
 
 
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
 66
 67
 68
@@ -324,26 +385,85 @@ not defined within the <code>inventory.yaml</code> file</p>
 116
 117
 118
-119</pre>
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165</pre>
       </td>
       <td>
-        <pre class="code"><span class="info file"># File 'plans/init.pp', line 51</span>
+        <pre class="code"><span class="info file"># File 'plans/init.pp', line 66</span>
 
 plan splunk_qd(
-  String[1] $version               = &#39;7.2.5&#39;,
-  String[1] $build                 = &#39;088f49762779&#39;,
-  Optional[String[1]] $search_host = undef,
-  Boolean $manage_addons           = true,
-  Boolean $manage_forwarders       = true,
-  Boolean $manage_search           = true,
+  String[1] $version                                      = &#39;7.2.5&#39;,
+  String[1] $build                                        = &#39;088f49762779&#39;,
+  Optional[String[1]] $search_host                        = undef,
+  Boolean $manage_addons                                  = true,
+  Boolean $manage_forwarders                              = true,
+  Boolean $manage_search                                  = true,
+  Boolean $web_ssl                                        = false,
+  Optional[Enum[&#39;internal&#39;, &#39;letsencrypt&#39;]] $web_ssl_mode = undef,
+  Optional[String[1]] $web_ssl_reg_email                  = undef,
+  Optional[String[1]] $web_ssl_reg_fqdn                   = undef,
 ) {
 
   # Alwasy look this up since we have a use for the data defined with it even if
   # we do not plan on managing the node and its fine if if returns nil
   $search_head = get_targets(&#39;search_head&#39;)
 
+
   # Conditional to disable search node management
   if $manage_search {
+
+    if $web_ssl {
+      $_ssl = merge($search_head[0].vars[&#39;ssl&#39;], {
+        &#39;mode&#39;      =&gt; $web_ssl_mode,
+        &#39;reg_email&#39; =&gt; $web_ssl_reg_email,
+        &#39;reg_fqdn&#39;  =&gt; $web_ssl_reg_fqdn,
+      }.filter |$setting| { $setting[1] != undef })
+    }
 
     # Ensures the agentless Puppet helper is installed and gathers facts, always
     # have to run the apply_prep function ahead of an apply block even if the
@@ -353,7 +473,7 @@ plan splunk_qd(
 
     # Function informing Bolt that we are going to execute agentless Puppet
     # code on a remote set of nodes
-    apply($search_head) {
+    $manage_search_results = apply($search_head) {
       # Bolt makes it super easy to follow existing best practices and the all
       # great pieces of content found out in out broad ecosystem, as we&#39;ve done
       # here building a simple profile for manager Splunk Enterprise which in
@@ -365,36 +485,54 @@ plan splunk_qd(
         build         =&gt; $build,
         manage_addons =&gt; $manage_addons,
         addons        =&gt; $addons,
+        web_ssl       =&gt; $web_ssl,
+        ssl           =&gt; defined(&#39;$_ssl&#39;) ? { true =&gt; $_ssl, default =&gt; {} },
       }
+    }
+    if $manage_search_results.first.report[&#39;status&#39;] == &#39;changed&#39; {
+      if $web_ssl {
+        if $_ssl[&#39;reg_fqdn&#39;] {
+          $success_url = &quot;https://${_ssl[&#39;reg_fqdn&#39;]}&quot;
+        } else {
+          $success_url = &quot;https://${search_head[0].host}&quot;
+        }
+      } else {
+        $success_url = &quot;http://${search_head[0].host}:8000&quot;
+      }
+      notice(&quot;Splunk Enterprise is now ready at ${success_url}&quot;)
     }
   }
 
   # Everything from here on down is pretty similar to what&#39;s above with a couple
   # exceptions...
   if $manage_forwarders {
+    if ! defined(&#39;$manage_search_results&#39;) or $manage_search_results.ok {
 
-    $forwarders = get_targets(&#39;forwarders&#39;)
+      $forwarders = get_targets(&#39;forwarders&#39;)
 
-    # Checks to see if search_host was set on the command line and if so
-    # prioritizes is value, then copies it into a private variable to be passed
-    # into our forwarder profile. If the variable was not set then it attempts
-    # to derive it from the search_head object found in the inventory.yaml file.
-    if $search_host {
-      $_search_host = $search_host
-    } else {
-      $_search_host = $search_head[0].host
-    }
-
-    $forwarders.apply_prep
-
-    apply($forwarders) {
-      class { &#39;splunk_qd::profile::forward&#39;:
-        version       =&gt; $version,
-        build         =&gt; $build,
-        manage_addons =&gt; $manage_addons,
-        addons        =&gt; $addons,
-        search_host   =&gt; $_search_host,
+      # Checks to see if search_host was set on the command line and if so
+      # prioritizes is value, then copies it into a private variable to be passed
+      # into our forwarder profile. If the variable was not set then it attempts
+      # to derive it from the search_head object found in the inventory.yaml file.
+      if $search_host {
+        $_search_host = $search_host
+      } else {
+        $_search_host = $search_head[0].host
       }
+
+      $forwarders.apply_prep
+
+      apply($forwarders) {
+        class { &#39;splunk_qd::profile::forward&#39;:
+          version       =&gt; $version,
+          build         =&gt; $build,
+          manage_addons =&gt; $manage_addons,
+          addons        =&gt; $addons,
+          search_host   =&gt; $_search_host,
+        }
+      }
+    } else {
+      fail_plan(&#39;Universal Forwarder configuration skipped due to previous failure configuring Splunk Enterprise&#39;)
     }
   }
 }</pre>

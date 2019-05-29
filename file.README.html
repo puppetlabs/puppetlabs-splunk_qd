@@ -60,10 +60,12 @@
       <div id="content"><div id='filecontents'>
 <h1 id="label-splunk_qd+-28Splunk+Quick+Deploy-29">splunk_qd (Splunk Quick Deploy)</h1>
 
-<p>Quick and simple deployment of Splunk for testing and evaulation.</p>
+<p>Lightning-fast deployment of Splunk for simple testing and evaluation.</p>
 
-<p>Module still early in development so goals and code will be changing
-wildly.</p>
+<p>This code is experimental and unsupported but is in active development and
+rests upon the strong foundation of a production-grade module, the Puppet
+Approved <a href="https://forge.puppet.com/puppet/splunk">puppet/splunk</a>
+maintained by <a href="https://voxpupuli.org">Vox Pupuli</a>.</p>
 
 <h4 id="label-Table+of+Contents">Table of Contents</h4>
 <ol><li>
@@ -172,10 +174,10 @@ added</p>
 </li><li>
 <p>The example <code>inventory.yaml</code> file has an <em>addons</em>
 variable set under the <em>forwarders</em> group which contains a hash of
-add-ons to be configured when the forwarder is installed, it is safe to
-delete the variable and you can skip to step 13 if you wish to
-<strong>ONLY</strong> install the forwarder will configure add-ons in a
-different way later</p>
+add-ons to be configured when the forwarder is installed, the variable can
+be deleted and you can skip to step 13 if you wish to <strong>ONLY</strong>
+install the forwarder and intend on configuring add-ons in a different way
+later</p>
 </li><li>
 <p>To install add-ons you must first obtain them from <a
 href="https://splunkbase.splunk.com/">splunkbase</a> in .tgz format, the
@@ -201,7 +203,6 @@ add-on input is a hash of input name and sub-hash of settings, keys being
 the setting and values being what the setting should be set to.
 (<strong>DON&#39;T STOP HERE:</strong> There are a couple more steps below
 the following example)</p>
-</li></ol>
 
 <p><strong>Example</strong></p>
 
@@ -217,11 +218,11 @@ disabled = false
 format:</p>
 
 <pre class="code ruby"><code class="ruby">monitor:///var/log:
-whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
-blacklist: (lastlog|anaconda\.syslog)
-disabled:  false
+  whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+  blacklist: (lastlog|anaconda\.syslog)
+  disabled:  false
 </code></pre>
-<ol><li>
+</li><li>
 <p>After you&#39;ve configured all your add-ons and inputs, write and close
 <code>inventory.yaml</code></p>
 </li><li>
@@ -229,10 +230,10 @@ disabled:  false
 <code>$boltdir/modules/splunk_qd/files/addons/</code></p>
 </li><li>
 <p>Now you should be ready to run the following command:</p>
-</li></ol>
 
 <p><code>bolt plan run splunk_qd manage_search=false
 search_host=fqdn_of_splunk_enterprise_server</code></p>
+</li></ol>
 
 <h4 id="label-Scenario+2">Scenario 2</h4>
 
@@ -261,9 +262,9 @@ Splunk Universal Forwarder on</p>
 <p>The example <code>inventory.yaml</code> file has an <em>addons</em>
 variable set under the <strong>search_head</strong> node and the
 <strong>forwarders</strong> group which contains a hash of add-ons or apps
-to be configured when the either is installed, it is safe to delete the
-variable and you can skip to step 15 if you wish to <strong>ONLY</strong>
-install the software and will configure add-ons and apps in a different way
+to be configured when the either is installed, the variable can be deleted
+and you can skip to step 15 if you wish to <strong>ONLY</strong> install
+the software and intend on configuring add-ons and apps in a different way
 later</p>
 </li><li>
 <p>To install add-ons or apps you must first obtain them from <a
@@ -298,7 +299,6 @@ add-on input is a hash of input name and sub-hash of settings, keys being
 the setting and values being what the setting should be set to.
 (<strong>DON&#39;T STOP HERE:</strong> There are a couple more steps below
 the following example)</p>
-</li></ol>
 
 <p><strong>Example</strong></p>
 
@@ -314,11 +314,11 @@ disabled = false
 format:</p>
 
 <pre class="code ruby"><code class="ruby">monitor:///var/log:
-whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
-blacklist: (lastlog|anaconda\.syslog)
-disabled:  false
+  whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+  blacklist: (lastlog|anaconda\.syslog)
+  disabled:  false
 </code></pre>
-<ol><li>
+</li><li>
 <p>After you&#39;ve configured all your add-ons, apps, and inputs, write and
 close <code>inventory.yaml</code></p>
 </li><li>
@@ -326,9 +326,9 @@ close <code>inventory.yaml</code></p>
 splunkbase to <code>$boltdir/modules/splunk_qd/files/addons/</code></p>
 </li><li>
 <p>Now you should be ready to run the following command:</p>
-</li></ol>
 
 <p><code>bolt plan run splunk_qd</code></p>
+</li></ol>
 
 <h2 id="label-Limitations">Limitations</h2>
 

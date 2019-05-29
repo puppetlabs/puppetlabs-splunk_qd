@@ -64,6 +64,15 @@
   
   
   <dl>
+    <dt>Inherited by:</dt>
+    <dd>
+      
+      <span class='object_link'><a href="splunk_qd_3A_3Aprofile_3A_3Asearch_3A_3Assl.html" title="puppet_classes::splunk_qd::profile::search::ssl (puppet_class)">splunk_qd::profile::search::ssl</a></span><br/>
+      
+    </dd>
+  </dl>
+  
+  <dl>
     <dt>Defined in:</dt>
     <dd>
       manifests/profile/search.pp
@@ -98,13 +107,50 @@
   
     <li>
       
+        <span class='name'>addons</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>web_ssl</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ssl</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
         <span class='name'>version</span>
       
       
-        <span class='type'>(<tt>String</tt>)</span>
+        <span class='type'>(<tt>String[1]</tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>undef</tt>)</em>
       
       
     </li>
@@ -114,23 +160,8 @@
         <span class='name'>build</span>
       
       
-        <span class='type'>(<tt>String</tt>)</span>
+        <span class='type'>(<tt>String[1]</tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>undef</tt>)</em>
-      
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>addons</span>
-      
-      
-        <span class='type'>(<tt>Array</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>[]</tt>)</em>
       
       
     </li>
@@ -181,16 +212,47 @@
 34
 35
 36
-37</pre>
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66</pre>
       </td>
       <td>
         <pre class="code"><span class="info file"># File 'manifests/profile/search.pp', line 1</span>
 
 class splunk_qd::profile::search(
-  Boolean $manage_addons  = true,
-  String  $version        = undef,
-  String  $build          = undef,
-  Array   $addons         = [],
+  Boolean $manage_addons = true,
+  Array $addons          = [],
+  Boolean $web_ssl       = false,
+  Hash $ssl              = {},
+  String[1] $version,
+  String[1] $build,
 ) {
 
   # Declaring Class[splunk:params] here is how control which version of Splunk
@@ -200,14 +262,25 @@ class splunk_qd::profile::search(
     build   =&gt; $build,
   }
 
-  # The class that actually sets up Splunk Enterprise is set here to manage the
-  # password file so we know the admin password so we can long in and don&#39;t be
+  # The class that actually sets up Splunk Enterprise is set here to manage the # password file so we know the admin password so we can long in and don&#39;t be
   # concerned over it is implying we&#39;re going to always install the lasets
   # release, the version downloaded is dictaed by Class[splunk::params] so
   # packages will only upgrade if you specify a newer version parameter there.
   class { &#39;splunk::enterprise&#39;:
     package_ensure  =&gt; latest,
     manage_password =&gt; true,
+    web_httpport    =&gt;  $web_ssl ? {
+      true    =&gt; 443,
+      default =&gt; 8000,
+    }
+  }
+
+  if $web_ssl {
+    class { &#39;splunk_qd::profile::search::ssl&#39;:
+      mode               =&gt; $ssl[&#39;mode&#39;],
+      registration_email =&gt; $ssl[&#39;reg_email&#39;],
+      registration_fqdn  =&gt; $ssl[&#39;reg_fqdn&#39;],
+    }
   }
 
   # Its safe to interate over an empty array, effectively a noop if you haven&#39;t
@@ -219,6 +292,22 @@ class splunk_qd::profile::search(
         splunkbase_source =&gt; &quot;puppet:///modules/splunk_qd/addons/${addon[&#39;filename&#39;]}&quot;,
         inputs            =&gt; $addon[&#39;inputs&#39;],
         notify            =&gt;  Class[&#39;splunk::enterprise::service&#39;],
+      }
+
+      # If the add-on has a set of settings that are set outside of inputs.conf
+      # then they should be added to the `additional_settings` hash,
+      # puppet/splunk doesn&#39;t currently understand all files that configuration
+      # can be storred in so this is implemented with raw usage of ini_setting.
+      if $addon[&#39;additional_settings&#39;] {
+        $addon[&#39;additional_settings&#39;].each |$setting, $values| {
+          ini_setting { &quot;${addon[&#39;name&#39;]}_${values[&#39;filename&#39;]}_${values[&#39;section&#39;]}_${setting}&quot;:
+            ensure         =&gt; present,
+            path           =&gt;  &quot;${splunk::params::enterprise_homedir}/etc/apps/${addon[&#39;name&#39;]}/local/${values[&#39;filename&#39;]}&quot;,
+            section        =&gt; $values[&#39;section&#39;],
+            setting        =&gt; $setting,
+            value          =&gt; $values[&#39;value&#39;],
+          }
+        }
       }
     }
   }

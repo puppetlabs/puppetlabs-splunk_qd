@@ -196,7 +196,23 @@
 38
 39
 40
-41</pre>
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre>
       </td>
       <td>
         <pre class="code"><span class="info file"># File 'manifests/profile/forward.pp', line 1</span>
@@ -238,6 +254,22 @@ class splunk_qd::profile::forward(
         splunkbase_source =&gt; &quot;puppet:///modules/splunk_qd/addons/${addon[&#39;filename&#39;]}&quot;,
         inputs            =&gt; $addon[&#39;inputs&#39;],
         notify            =&gt;  Class[&#39;splunk::forwarder::service&#39;],
+      }
+
+      # If the add-on has a set of settings that are set outside of inputs.conf
+      # then they should be added to the `additional_settings` hash,
+      # puppet/splunk doesn&#39;t currently understand all files that configuration
+      # can be storred in so this is implemented with raw usage of ini_setting.
+      if $addon[&#39;additional_settings&#39;] {
+        $addon[&#39;additional_settings&#39;].each |$setting, $values| {
+          ini_setting { &quot;${addon[&#39;name&#39;]}_${values[&#39;filename&#39;]}_${values[&#39;section&#39;]}_${setting}&quot;:
+            ensure         =&gt; present,
+            path           =&gt;  &quot;${splunk::params::forwarder_homedir}/etc/apps/${addon[&#39;name&#39;]}/local/${values[&#39;filename&#39;]}&quot;,
+            section        =&gt; $values[&#39;section&#39;],
+            setting        =&gt; $setting,
+            value          =&gt; $values[&#39;value&#39;],
+          }
+        }
       }
     }
   }
