@@ -48,22 +48,49 @@
 # @param manage_search
 #   Explicitly disable the management of Splunk Enterprise
 #
+# @param web_ssl
+#   To configure Splunk Enterprise Web with SSL and redirect traffic on port 80
+#   to 443
+#
+# @param web_ssl_mode
+#   Switch between the two available SSL providers supported by the module
+#
+# @param web_ssl_reg_email
+#   When using the `letsencrypt` SSL provider you must provide an email address
+#   to be used as an account that the certificate will be registered to
+#
+# @param web_ssl_reg_fqdn
+#   Sets the common name on the generated and signed certificate when using the
+#   `letsencrypt` SSL provider
+#
 plan splunk_qd(
-  String[1] $version               = '7.2.5',
-  String[1] $build                 = '088f49762779',
-  Optional[String[1]] $search_host = undef,
-  Boolean $manage_addons           = true,
-  Boolean $manage_forwarders       = true,
-  Boolean $manage_search           = true,
-  Boolean $web_ssl                 = false,
+  String[1] $version                                      = '7.2.5',
+  String[1] $build                                        = '088f49762779',
+  Optional[String[1]] $search_host                        = undef,
+  Boolean $manage_addons                                  = true,
+  Boolean $manage_forwarders                              = true,
+  Boolean $manage_search                                  = true,
+  Boolean $web_ssl                                        = false,
+  Optional[Enum['internal', 'letsencrypt']] $web_ssl_mode = undef,
+  Optional[String[1]] $web_ssl_reg_email                  = undef,
+  Optional[String[1]] $web_ssl_reg_fqdn                   = undef,
 ) {
 
   # Alwasy look this up since we have a use for the data defined with it even if
   # we do not plan on managing the node and its fine if if returns nil
   $search_head = get_targets('search_head')
 
+
   # Conditional to disable search node management
   if $manage_search {
+
+    if $web_ssl {
+      $_ssl = merge($search_head[0].vars['ssl'], {
+        'mode'      => $web_ssl_mode,
+        'reg_email' => $web_ssl_reg_email,
+        'reg_fqdn'  => $web_ssl_reg_fqdn,
+      }.filter |$setting| { $setting[1] != undef })
+    }
 
     # Ensures the agentless Puppet helper is installed and gathers facts, always
     # have to run the apply_prep function ahead of an apply block even if the
@@ -86,24 +113,22 @@ plan splunk_qd(
         manage_addons => $manage_addons,
         addons        => $addons,
         web_ssl       => $web_ssl,
-        ssl           => $ssl
+        ssl           => defined('$_ssl') ? { true => $_ssl, default => {} },
       }
     }
     if $manage_search_results.first.report['status'] == 'changed' {
       if $web_ssl {
-        if $search_head[0].vars['ssl']['external_fqdn'] {
-          $success_url = "https://${search_head[0].vars['ssl']['external_fqdn']}"
+        if $_ssl['reg_fqdn'] {
+          $success_url = "https://${_ssl['reg_fqdn']}"
         } else {
           $success_url = "https://${search_head[0].host}"
         }
       } else {
-        $succes_url = "http://${search_head[0].host}:8000"
+        $success_url = "http://${search_head[0].host}:8000"
       }
       notice("Splunk Enterprise is now ready at ${success_url}")
     }
   }
-
-
 
   # Everything from here on down is pretty similar to what's above with a couple
   # exceptions...

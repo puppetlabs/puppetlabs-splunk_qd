@@ -1,10 +1,10 @@
 class splunk_qd::profile::search(
-  Boolean $manage_addons  = true,
-  String  $version        = undef,
-  String  $build          = undef,
-  Array   $addons         = [],
-  Boolean $web_ssl        = false,
-  Hash    $ssl            = {}
+  Boolean $manage_addons = true,
+  Array $addons          = [],
+  Boolean $web_ssl       = false,
+  Hash $ssl              = {},
+  String[1] $version,
+  String[1] $build,
 ) {
 
   # Declaring Class[splunk:params] here is how control which version of Splunk
@@ -30,8 +30,8 @@ class splunk_qd::profile::search(
   if $web_ssl {
     class { 'splunk_qd::profile::search::ssl':
       mode               => $ssl['mode'],
-      registration_email => $ssl['registration_email'],
-      external_fqdn      => $ssl['external_fqdn'],
+      registration_email => $ssl['reg_email'],
+      registration_fqdn  => $ssl['reg_fqdn'],
     }
   }
 
