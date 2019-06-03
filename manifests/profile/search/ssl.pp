@@ -7,11 +7,11 @@ class splunk_qd::profile::search::ssl(
   class { 'apache': default_vhost => false }
 
   apache::vhost { "redirect ${registration_fqdn} non-ssl":
-    servername      => $registration_fqdn,
-    port            => '80',
-    docroot         => "/var/www/${registration_fqdn}",
-    manage_docroot  => true,
-    redirect_status => 'permanent',
+    servername           => $registration_fqdn,
+    port                 => '80',
+    docroot              => "/var/www/${registration_fqdn}",
+    manage_docroot       => true,
+    redirect_status      => 'permanent',
     redirectmatch_regexp => '^(/(?!\.well-known/).*)',
     redirectmatch_dest   => "https://${registration_fqdn}/\$1",
   }
@@ -35,6 +35,7 @@ class splunk_qd::profile::search::ssl(
       domains              => [$registration_fqdn],
       plugin               => 'webroot',
       webroot_paths        => ["/var/www/${registration_fqdn}"],
+      require              => Apache::Vhost["redirect ${registration_fqdn} non-ssl"],
 
     } -> Splunk_web <||>
   } else {
