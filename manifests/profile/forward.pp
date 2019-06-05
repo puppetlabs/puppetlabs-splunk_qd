@@ -1,19 +1,32 @@
 class splunk_qd::profile::forward(
   String  $search_host,
   Boolean $manage_addons                 = true,
+  Boolean $cloud                         = false,
   String  $version                       = undef,
   String  $build                         = undef,
   Array   $addons                        = [],
   Optional[String[1]] $addon_source_path = undef
 ) {
 
+  if $cloud {
+    $extra_params = {}
+    $extra_forwarder = {
+      'forwarder_output' => {},
+      'purge_outputs'    => true,
+    }
+  } else {
+    $extra_params = { 'server' =>  $search_host }
+    $extra_forwarder = {}
+  }
+
   # Declaring Class[splunk:params] here is how you control which version of
   # Splunk Universal Forwarder is downloaded and installed and set the host
   # you wish to forward your data to for indexing.
+
   class { 'splunk::params':
-    server  => $search_host,
     version => $version,
     build   => $build,
+    *       => $extra_params,
   }
 
   # The class that actually sets up Splunk Universal forwarder is set here to
@@ -22,9 +35,11 @@ class splunk_qd::profile::forward(
   # latest release, the version downloaded is dictaed by Class[splunk::params]
   # so packages will only upgrade if you specify a newer version parameter
   # there.
+
   class { 'splunk::forwarder':
     package_ensure  => latest,
     manage_password => true,
+    *               => $extra_forwarder,
   }
 
   if $addon_source_path {

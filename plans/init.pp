@@ -75,6 +75,7 @@ plan splunk_qd(
   Boolean $manage_forwarders                              = true,
   Boolean $manage_search                                  = true,
   Boolean $web_ssl                                        = false,
+  Boolean $cloud                                          = false,
   Optional[Enum['internal', 'letsencrypt']] $web_ssl_mode = undef,
   Optional[String[1]] $web_ssl_reg_email                  = undef,
   Optional[String[1]] $web_ssl_reg_fqdn                   = undef,
@@ -143,15 +144,17 @@ plan splunk_qd(
 
       $forwarders = get_targets('forwarders')
 
-      # Checks to see if search_host was set on the command line and if so
-      # prioritizes is value, then copies it into a private variable to be passed
-      # into our forwarder profile. If the variable was not set then it attempts
-      # to derive it from the search_head object found in the inventory.yaml file.
+      # First hecks to see if were running in cloud moe if not will check if
+      # search_host was set on the command line and if so prioritizes is value,
+      # then copies it into a private variable to be passed into our forwarder
+      # profile. If the variable was not set then it attempts to derive it from
+      # the search_head object found in the inventory.yaml file.
       if $search_host {
         $_search_host = $search_host
       } else {
         $_search_host = $search_head[0].host
       }
+
 
       $forwarders.apply_prep
 
@@ -163,6 +166,7 @@ plan splunk_qd(
           addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
           addons            => $addons,
           search_host       => $_search_host,
+          cloud             => $cloud,
         }
       }
     } else {
