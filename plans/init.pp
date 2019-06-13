@@ -122,7 +122,7 @@ plan splunk_qd(
         build             => $build,
         manage_addons     => $manage_addons,
         addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
-        addons            => $addons,
+        addons            => defined('$addons') ? { true => $addons, default => [] },
         web_ssl           => $web_ssl,
         ssl               => defined('$_ssl') ? { true => $_ssl, default => {} },
       }
@@ -168,7 +168,7 @@ plan splunk_qd(
           build             => $build,
           manage_addons     => $manage_addons,
           addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
-          addons            => $addons,
+          addons            => defined('$addons') ? { true => $addons, default => [] },
           search_host       => $_search_host,
           cloud             => $cloud,
         }
