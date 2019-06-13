@@ -67,9 +67,13 @@
 #   Used for defining a source path that is different than the default in module
 #   path
 #
+# @param forwarder_group
+#   Set the inventory group that splunk_qd will source forwarders from
+#
 plan splunk_qd(
   String[1] $version                                      = '7.2.5',
   String[1] $build                                        = '088f49762779',
+  String[1] $forwarder_group                              = 'forwarders',
   Optional[String[1]] $search_host                        = undef,
   Boolean $manage_addons                                  = true,
   Boolean $manage_forwarders                              = true,
@@ -142,7 +146,7 @@ plan splunk_qd(
   if $manage_forwarders {
     if ! defined('$manage_search_results') or $manage_search_results.ok {
 
-      $forwarders = get_targets('forwarders')
+      $forwarders = get_targets($forwarder_group)
 
       # First hecks to see if were running in cloud moe if not will check if
       # search_host was set on the command line and if so prioritizes is value,
