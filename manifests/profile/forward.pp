@@ -19,6 +19,15 @@ class splunk_qd::profile::forward(
     $extra_forwarder = {}
   }
 
+  if $facts['osfamily'] == 'Windows' {
+    $_extra_forwarder = merge($extra_forwarder, {
+      'package_provider' => 'chocolatey',
+      'package_name'     => 'splunk-universalforwarder',
+    })
+  } else {
+    $_extra_forwarder = $extra_forwarder
+  }
+
   # Declaring Class[splunk:params] here is how you control which version of
   # Splunk Universal Forwarder is downloaded and installed and set the host
   # you wish to forward your data to for indexing.
@@ -37,7 +46,10 @@ class splunk_qd::profile::forward(
   # there.
 
   class { 'splunk::forwarder':
-    package_ensure  => latest,
+    package_ensure  => $facts['osfamily'] ? {
+      'Windows' => present,
+      default   => latest,
+    },
     manage_password => true,
     *               => $extra_forwarder,
   }
