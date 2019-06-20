@@ -22,7 +22,6 @@ class splunk_qd::profile::search(
   class { 'splunk::enterprise':
     package_ensure   => latest,
     manage_password  => true,
-    reset_admin      => true,
     password_content => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
     web_httpport     => $web_ssl ? {
       true    => 443,
