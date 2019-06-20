@@ -20,10 +20,11 @@ class splunk_qd::profile::search(
   # release, the version downloaded is dictaed by Class[splunk::params] so
   # packages will only upgrade if you specify a newer version parameter there.
   class { 'splunk::enterprise':
-    package_ensure  => latest,
-    manage_password => true,
-    reset_admin     => true,
-    web_httpport    =>  $web_ssl ? {
+    package_ensure   => latest,
+    manage_password  => true,
+    reset_admin      => true,
+    password_content => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
+    web_httpport     => $web_ssl ? {
       true    => 443,
       default => 8000,
     }
