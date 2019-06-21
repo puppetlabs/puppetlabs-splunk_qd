@@ -21,8 +21,8 @@ class splunk_qd::profile::search(
   # packages will only upgrade if you specify a newer version parameter there.
   class { 'splunk::enterprise':
     package_ensure   => latest,
-    manage_password  => true,
-    password_content => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
+    seed_password    => true,
+    password_hash    => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
     web_httpport     => $web_ssl ? {
       true    => 443,
       default => 8000,

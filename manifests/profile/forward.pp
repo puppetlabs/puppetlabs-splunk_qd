@@ -50,7 +50,8 @@ class splunk_qd::profile::forward(
       'Windows' => present,
       default   => latest,
     },
-    manage_password => true,
+    seed_password    => true,
+    password_hash    => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
     *               => $extra_forwarder,
   }
 
