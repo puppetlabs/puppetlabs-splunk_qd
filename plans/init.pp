@@ -84,7 +84,7 @@ plan splunk_qd(
   Optional[String[1]] $web_ssl_reg_email                  = undef,
   Optional[String[1]] $web_ssl_reg_fqdn                   = undef,
   Optional[String[1]] $addon_source_path                  = undef,
-  String[1]           $passwd_hash                        = '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1'
+  String[1]           $passwd_hash                        = '$6$E4XR.g0Sq.2JvbgT$me1K9oruJuXG09NSDv2I0wCKl9DS4ETv/XY5YqyZM5ctf.cp06JSN6x.MG2Y0lJ9zLfY6zpMn6GJNo.9O4cWH/',
 ) {
 
   # Alwasy look this up since we have a use for the data defined with it even if
