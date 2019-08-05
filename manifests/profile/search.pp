@@ -1,10 +1,11 @@
 class splunk_qd::profile::search(
-  Boolean $manage_addons                = true,
-  Array $addons                         = [],
-  Boolean $web_ssl                      = false,
-  Hash $ssl                             = {},
-  String[1] $version,
-  String[1] $build,
+  String[1]           $version,
+  String[1]           $build,
+  Boolean             $manage_addons     = true,
+  Array               $addons            = [],
+  Boolean             $web_ssl           = false,
+  Hash                $ssl               = {},
+  String[1]           $passwd_hash       = '$6$E4XR.g0Sq.2JvbgT$me1K9oruJuXG09NSDv2I0wCKl9DS4ETv/XY5YqyZM5ctf.cp06JSN6x.MG2Y0lJ9zLfY6zpMn6GJNo.9O4cWH/',
   Optional[String[1]] $addon_source_path = undef
 ) {
 
@@ -22,7 +23,7 @@ class splunk_qd::profile::search(
   class { 'splunk::enterprise':
     package_ensure   => latest,
     seed_password    => true,
-    password_hash    => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
+    password_hash    => $passwd_hash,
     web_httpport     => $web_ssl ? {
       true    => 443,
       default => 8000,

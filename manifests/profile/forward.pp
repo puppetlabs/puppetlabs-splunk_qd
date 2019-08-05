@@ -4,6 +4,7 @@ class splunk_qd::profile::forward(
   Boolean $cloud                         = false,
   String  $version                       = undef,
   String  $build                         = undef,
+  String  $passwd_hash                   = '$6$E4XR.g0Sq.2JvbgT$me1K9oruJuXG09NSDv2I0wCKl9DS4ETv/XY5YqyZM5ctf.cp06JSN6x.MG2Y0lJ9zLfY6zpMn6GJNo.9O4cWH/',
   Array   $addons                        = [],
   Optional[String[1]] $addon_source_path = undef
 ) {
@@ -50,8 +51,8 @@ class splunk_qd::profile::forward(
       'Windows' => present,
       default   => latest,
     },
-    seed_password    => true,
-    password_hash    => '$6$jxSX7ra2SNzeJbYE$J95eTTMJjFr/lBoGYvuJUSNKvR7befnBwZUOvr/ky86QGqDXwEwdbgPMfCxW1/PuB/IkC94QLNravkABBkVkV1',
+    seed_password   => true,
+    password_hash   => $passwd_hash,
     *               => $extra_forwarder,
   }
 

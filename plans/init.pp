@@ -84,6 +84,7 @@ plan splunk_qd(
   Optional[String[1]] $web_ssl_reg_email                  = undef,
   Optional[String[1]] $web_ssl_reg_fqdn                   = undef,
   Optional[String[1]] $addon_source_path                  = undef,
+  String[1]           $passwd_hash                        = '$6$E4XR.g0Sq.2JvbgT$me1K9oruJuXG09NSDv2I0wCKl9DS4ETv/XY5YqyZM5ctf.cp06JSN6x.MG2Y0lJ9zLfY6zpMn6GJNo.9O4cWH/',
 ) {
 
   # Alwasy look this up since we have a use for the data defined with it even if
@@ -120,6 +121,7 @@ plan splunk_qd(
       class { 'splunk_qd::profile::search':
         version           => $version,
         build             => $build,
+        passwd_hash       => $passwd_hash,
         manage_addons     => $manage_addons,
         addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
         addons            => defined('$addons') ? { true => $addons, default => [] },
@@ -166,6 +168,7 @@ plan splunk_qd(
         class { 'splunk_qd::profile::forward':
           version           => $version,
           build             => $build,
+          passwd_hash       => $passwd_hash,
           manage_addons     => $manage_addons,
           addon_source_path => defined('$addon_source_path') ? { true => $addon_source_path, default => undef },
           addons            => defined('$addons') ? { true => $addons, default => [] },
