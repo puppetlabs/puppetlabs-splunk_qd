@@ -1,0 +1,23 @@
+forge 'https://forge.puppet.com'
+
+# Modules from the Puppet Forge
+mod 'puppet-archive', '3.2.1'
+mod 'puppetlabs-apache', '4.1.0'
+mod 'puppetlabs-concat', '5.3.0'
+mod 'puppetlabs-inifile', '3.0.0'
+mod 'puppetlabs-stdlib', '5.2.0'
+mod 'stahnma-epel', '1.3.1'
+mod 'puppetlabs-chocolatey', '4.0.0'
+mod 'puppetlabs-registry', '2.1.0'
+mod 'puppetlabs-powershell', '2.3.0'
+
+# Modules from Git
+mod 'puppet-letsencrypt',
+    git: 'https://github.com/voxpupuli/puppet-letsencrypt.git',
+    ref: '93608eeefb8e12cf0597b09c1ec54837e9ea235d'
+mod 'puppet-splunk',
+    git: 'https://github.com/voxpupuli/puppet-splunk.git',
+    ref: '6e54f1a729642b30a8618f717b61491c937cc15c'
+mod 'puppetlabs-splunk_qd',
+    git: 'https://github.com/puppetlabs/puppetlabs-splunk_qd.git',
+    ref: 'master'
