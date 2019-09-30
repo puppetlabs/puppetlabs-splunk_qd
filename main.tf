@@ -2,6 +2,11 @@ provider "aws" {
   region = "us-west-2"
 }
 
+variable "key_name" {
+  type        = string
+  description = "The key_name to use for the EC2 instance."
+}
+
 resource "aws_security_group" "search_head" {
   name        = "splunk_search_head"
   description = "Used in the terraform"
@@ -33,7 +38,7 @@ resource "aws_instance" "search_head" {
     host = "${self.public_ip}"
   }
   instance_type = "m5.large"
-  key_name = "ryan_mbp"
+  key_name = var.key_name
   ami = "ami-0f2176987ee50226e"
   vpc_security_group_ids = ["${aws_security_group.search_head.id}","sg-02cf02361bcd51e54"]
   subnet_id = "subnet-020e959a848f88088"
@@ -43,12 +48,6 @@ resource "aws_instance" "search_head" {
   root_block_device {
     volume_size = 50
   }
-  provisioner "puppet" {
-    server      = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
-    server_user = "ec2-user"
-    autosign    = false
-    open_source = false
-  }
 }
 
 resource "aws_instance" "forwarder0" {
@@ -57,18 +56,12 @@ resource "aws_instance" "forwarder0" {
     host = "${self.public_ip}"
   }
   instance_type = "t2.micro"
-  key_name = "ryan_mbp"
+  key_name = var.key_name
   ami = "ami-0f2176987ee50226e"
   vpc_security_group_ids = ["sg-02cf02361bcd51e54"]
   subnet_id = "subnet-020e959a848f88088"
   tags = {
     termination_date = "indefinite"
-  }
-  provisioner "puppet" {
-    server      = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
-    server_user = "ec2-user"
-    autosign    = false
-    open_source = false
   }
 }
 resource "aws_instance" "forwarder1" {
@@ -77,20 +70,13 @@ resource "aws_instance" "forwarder1" {
     host = "${self.public_ip}"
   }
   instance_type = "t2.micro"
-  key_name = "ryan_mbp"
+  key_name = var.key_name
   ami = "ami-0f2176987ee50226e"
   vpc_security_group_ids = ["sg-02cf02361bcd51e54"]
   subnet_id = "subnet-020e959a848f88088"
   tags = {
     termination_date = "indefinite"
   }
-  provisioner "puppet" {
-    server      = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
-    server_user = "ec2-user"
-    autosign    = false
-    open_source = false
-  }
-
 }
 
 resource "aws_instance" "forwarder2" {
@@ -99,20 +85,13 @@ resource "aws_instance" "forwarder2" {
     host = "${self.public_ip}"
   }
   instance_type = "t2.micro"
-  key_name = "ryan_mbp"
+  key_name = var.key_name
   ami = "ami-0f2176987ee50226e"
   vpc_security_group_ids = ["sg-02cf02361bcd51e54"]
   subnet_id = "subnet-020e959a848f88088"
   tags = {
     termination_date = "indefinite"
   }
-  provisioner "puppet" {
-    server      = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
-    server_user = "ec2-user"
-    autosign    = false
-    open_source = false
-  }
-
 }
 
 # # Create a VPC to launch our instances into
