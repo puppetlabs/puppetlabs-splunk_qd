@@ -127,7 +127,7 @@ plan splunk_qd(
         ssl               => defined('$_ssl') ? { true => $_ssl, default => {} },
       }
     }
-    if $manage_search_results.first.report['status'] == 'changed' {
+    if $manage_search {
       if $web_ssl {
         if $_ssl['reg_fqdn'] {
           $success_url = "https://${_ssl['reg_fqdn']}"
@@ -137,7 +137,7 @@ plan splunk_qd(
       } else {
         $success_url = "http://${search_head[0].host}:8000"
       }
-      notice("Splunk Enterprise is now ready at ${success_url}")
+      out::message("Splunk Enterprise is now ready at ${success_url}")
     }
   }
 
