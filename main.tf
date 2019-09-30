@@ -48,6 +48,11 @@ resource "aws_instance" "search_head" {
   root_block_device {
     volume_size = 50
   }
+  provisioner "puppet" {
+    server = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
+    open_source = "false"
+    autosign = "false"
+  } 
 }
 
 resource "aws_instance" "forwarder0" {
@@ -63,6 +68,11 @@ resource "aws_instance" "forwarder0" {
   tags = {
     termination_date = "indefinite"
   }
+  provisioner "puppet" {
+    server = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
+    open_source = "false"
+    autosign = "false"
+  } 
 }
 resource "aws_instance" "forwarder1" {
   connection {
@@ -77,6 +87,11 @@ resource "aws_instance" "forwarder1" {
   tags = {
     termination_date = "indefinite"
   }
+  provisioner "puppet" {
+    server = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
+    open_source = "false"
+    autosign = "false"
+  } 
 }
 
 resource "aws_instance" "forwarder2" {
@@ -92,6 +107,11 @@ resource "aws_instance" "forwarder2" {
   tags = {
     termination_date = "indefinite"
   }
+  provisioner "puppet" {
+    server = "portland-5y3lgkjjdb5bednl.us-west-2.opsworks-cm.io"
+    open_source = "false"
+    autosign = "false"
+  } 
 }
 
 # # Create a VPC to launch our instances into
