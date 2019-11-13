@@ -1,0 +1,106 @@
+---
+version: 2
+config:
+  transport: ssh
+  ssh:
+    user: example
+    host-key-check: false
+    run-as: root
+  winrm:
+    user: example
+    ssl: true
+    ssl-verify: false
+    password:
+      _plugin: prompt
+      message: Please enter your winrm password
+
+groups:
+  - name: forwarder
+    groups:
+      - name: linux_forwarders
+        targets:
+          - web0.example.com
+          - web1.example.com
+          - app3.example.com
+        vars:
+          addons:
+            - name: Splunk_TA_nix
+              filename: splunk-add-on-for-unix-and-linux_602.tgz
+              inputs:
+                monitor:///var/log:
+                  whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+                  blacklist: (lastlog|anaconda\.syslog)
+                  disabled:  false
+                script://./bin/uptime.sh:
+                  interval:   86400
+                  source:     Unix:Uptime
+                  sourcetype: Unix:Uptime
+                  disabled:   false
+              additional_settings:
+                is_configured:
+                  filename: app.conf
+                  section: install
+                  value: true
+      - name: windows_forwarders
+        targets:
+          - db0.example.com
+          - domain1.example.com
+          - domain2.example.com
+        config:
+          transport: winrm
+        vars:
+          addons:
+            - name: Splunk_TA_windows
+              filename: splunk-add-on-for-microsoft-windows_600.zip
+              inputs:
+                WinEventLog://Application:
+                  disabled: false
+                  start_from: oldest
+                  current_only: false
+                  checkpointInterval: 5
+                  renderXml: true
+                WinEventLog://Security:
+                  disabled: false
+                  start_from: oldest
+                  current_only: false
+                  evt_resolve_ad_obj: 1
+                  checkpointInterval: 5
+                  blacklist1: EventCode="4662" Message="Object Type:(?!\s*groupPolicyContainer)"
+                  blacklist2: EventCode="566" Message="Object Type:(?!\s*groupPolicyContainer)"
+                  renderXml: true
+                WinEventLog://System:
+                  disabled: false
+                  start_from: oldest
+                  current_only: false
+                  checkpointInterval: 5
+                  renderXml: true
+              additional_settings:
+                is_configured:
+                  filename: app.conf
+                  section: install
+                  value: true
+
+  - name: search
+    targets: search.example.com
+      addons:
+        - name: Splunk_TA_nix
+          filename: splunk-add-on-for-unix-and-linux_602.tgz
+          inputs:
+            monitor:///var/log:
+              whitelist: (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+              blacklist: (lastlog|anaconda\.syslog)
+              disabled:  false
+            script://./bin/uptime.sh:
+              interval:   86400
+              source:     Unix:Uptime
+              sourcetype: Unix:Uptime
+              disabled:   false
+          additional_settings:
+            is_configured:
+              filename: app.conf
+              section: install
+              value: true
+            is_visible:
+              filename: app.conf
+              section: ui
+              value: false
