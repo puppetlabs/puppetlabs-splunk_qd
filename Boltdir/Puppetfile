@@ -17,7 +17,5 @@ mod 'puppet-letsencrypt',
     ref: '93608eeefb8e12cf0597b09c1ec54837e9ea235d'
 mod 'puppet-splunk',
     git: 'https://github.com/voxpupuli/puppet-splunk.git',
-    ref: '6e54f1a729642b30a8618f717b61491c937cc15c'
-mod 'puppetlabs-splunk_qd',
-    git: 'https://github.com/puppetlabs/puppetlabs-splunk_qd.git',
     ref: 'master'
+    # ref: '6e54f1a729642b30a8618f717b61491c937cc15c'
