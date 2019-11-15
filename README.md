@@ -56,20 +56,24 @@ In all cases you need to have installed and be familiar with [Puppet Bolt](https
 
 **Steps:**
 
-1. Copy `$boltdir/modules/splunk_qd/examples/inventory.yaml` to `$boltdir/inventory.yaml`
-2. Open `inventory.yaml` for editing
-3. Modify *config.ssh.user* to the correct login user for your hosts
-4. Modify *config.winrm.user* to the correct login user for your hosts
-5. Modify *config.winrm.password* to the correct login password for your hosts
-6. Set the value of *groups.name['search'].targets* to the fully qualified domain name or IP address of the node you want to install Splunk Enterprise on
-7. Find the nested *targets* parameter under *groups.name['forwarder'].groups.name['linux_forwarders']* and modify the array of nodes so it contains the fully qualified domain name or IP addresses for the Linux nodes you wish to manage the Splunk Universal Forwarder on
-8. Find the nested *targets* parameter under *groups.name['forwarder'].groups.name['windows_forwarders']* and modify the array of nodes so it contains the fully qualified domain name or IP addresses for the Windows nodes you wish to manage the Splunk Universal Forwarder on
-9. The example `inventory.yaml` file we started with has an *addons* variable set within each group, which is where add-on installation is defined and it currently setup to source add-ons for both sets of nodes from within the module
-10. To do you own add-on installation then look at Scenario 3 which walks through the additional steps
-11. After you've made you configuration changes, write and close `inventory.yaml`
-12. Now you should be ready to run the following command:
-
+1. In your CLI of choice, browse to the splunk_qd repository you’ve downloaded or cloned from GitHub. 
+2. Run `bolt —version` to validate that Bolt is installed successfully. This guide validated on version 1.37.0 but any recent version of Bolt should work with this guide. 
+3. Run `bolt puppetfile install` and Bolt will install all the Forge content necessary to complete this guide into Boltdir/modules, referencing the Puppetfile in the Boltdir. 
+4. Next, we’ll tell Bolt which machines to work with using any number of inventory targets. If you already have infrastructure suitable for deploying Splunk, copy `Boltdir/examples/inventory.yaml` to `Boltdir/inventory.yaml` and continue to the next step. 
+Alternatively, if you’re a Terraform user, you’ll find an example .tf Plan and integrated Bolt inventory.yaml in `Boltdir/examples/terraform`. Copy `Boltdir/examples/terraform/inventory.yaml` to `Boltdir/inventory.yaml` and continue to the next step. 
+5. Open `Boltdir/inventory.yaml` in your editor of choice. 
+6. Modify *config.ssh.user* to the correct login user for your hosts
+7. Modify *config.winrm.user* to the correct login user for your hosts
+8. Modify *config.winrm.password* to the correct login password for your hosts
+9. Set the value of *groups.name['search'].targets* to the fully qualified domain name or IP address of the node you want to install Splunk Enterprise on
+10. Find the nested *targets* parameter under *groups.name[‘forwarder’].groups.name[‘linux_forwarders’]* and modify the array of nodes so it contains the fully qualified domain name or IP addresses for the Linux nodes you wish to manage the Splunk Universal Forwarder on
+11. Find the nested *targets* parameter under *groups.name[‘forwarder’].groups.name[‘windows_forwarders’]* and modify the array of nodes so it contains the fully qualified domain name or IP addresses for the Windows nodes you wish to manage the Splunk Universal Forwarder on
+12. The example `inventory.yaml` file we started with has an *addons* variable set within each group, which is where add-on installation is defined and it currently setup to source add-ons for both sets of nodes from within the module
+13. After you’ve made you configuration changes, write and close `inventory.yaml`
+14. Now you should be ready to run the following command:
     `bolt plan run splunk_qd mode=testdrive`
+15. After a couple of minutes, Bolt should have successfully deployed Splunk Enterprise, configured apps and add-ons, and connected other infrastructure to Splunk by deploying forwarders. Visit the FQDN of the machine you associated with the search group in step 9 on port `8000` to login with the stock default admin/changeme login. 
+16. Well done! You’ve successfully automated the deployment of Splunk Enterprise in minutes. The Bolt Plan underpinning this guide supports SSL configurations with LetsEncrypt, password management, and other options for enterprise deployments. Have a look at the Plan documentation and play around with specifying different options using `bolt plan run splunk_qd param=value`. 
 
 #### Scenario 3
 
