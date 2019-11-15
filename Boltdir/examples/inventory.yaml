@@ -82,6 +82,7 @@ groups:
 
   - name: search
     targets: search.example.com
+    vars:
       addons:
         - name: Splunk_TA_nix
           filename: splunk-add-on-for-unix-and-linux_602.tgz
